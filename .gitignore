@@ -1,0 +1,16 @@
+.DS_Store
+.vercel
+node_modules
+*.log
+
+.vercel
+_backup_lowres
+
+_vorace_assets
+_save
+
+# interne / sources (hors demo publique)
+assets/
+README.md
+.claude/
+.vercel/

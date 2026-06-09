@@ -2,7 +2,7 @@ import React from 'react';
 import { motion } from 'motion/react';
 import { LOCATIONS } from '../data/menu.js';
 
-const HOURS = 'Mar-Jeu : 11h-14h et 19h-22h · Ven-Dim : 11h-13h30 et 19h-23h · Fermé le lundi';
+const HOURS = 'Mar-Jeu : 11h-14h et 19h-22h · Ven-Sam : 11h-14h et 19h-23h · Dim : 19h-23h · Fermé le lundi';
 
 export default function Location() {
   return (

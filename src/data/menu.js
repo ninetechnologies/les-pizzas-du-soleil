@@ -156,9 +156,9 @@ export const LOCATIONS = [
       { day: 'Mardi', value: '11h00 - 14h00 et 19h00 - 22h00' },
       { day: 'Mercredi', value: '11h00 - 14h00 et 19h00 - 22h00' },
       { day: 'Jeudi', value: '11h00 - 14h00 et 19h00 - 22h00' },
-      { day: 'Vendredi', value: '11h00 - 13h30 et 19h00 - 23h00' },
-      { day: 'Samedi', value: '11h00 - 13h30 et 19h00 - 23h00' },
-      { day: 'Dimanche', value: '11h00 - 13h30 et 19h00 - 23h00' },
+      { day: 'Vendredi', value: '11h00 - 14h00 et 19h00 - 23h00' },
+      { day: 'Samedi', value: '11h00 - 14h00 et 19h00 - 23h00' },
+      { day: 'Dimanche', value: '19h00 - 23h00' },
     ],
   },
 ];
@@ -168,13 +168,13 @@ export const LOCATIONS = [
    La generation des creneaux est dans Order.jsx (SCHEDULE). */
 export const SERVICE_HOURS = {
   byWeekday: {
-    0: [['11:00', '13:30'], ['19:00', '23:00']], // Dimanche
+    0: [['19:00', '23:00']],                       // Dimanche (soir seulement)
     1: null,                                       // Lundi ferme
     2: [['11:00', '14:00'], ['19:00', '22:00']],  // Mardi
     3: [['11:00', '14:00'], ['19:00', '22:00']],  // Mercredi
     4: [['11:00', '14:00'], ['19:00', '22:00']],  // Jeudi
-    5: [['11:00', '13:30'], ['19:00', '23:00']],  // Vendredi
-    6: [['11:00', '13:30'], ['19:00', '23:00']],  // Samedi
+    5: [['11:00', '14:00'], ['19:00', '23:00']],  // Vendredi
+    6: [['11:00', '14:00'], ['19:00', '23:00']],  // Samedi
   },
   slotMinutes: 15,
 };

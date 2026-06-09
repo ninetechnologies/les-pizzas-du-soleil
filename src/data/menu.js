@@ -151,30 +151,30 @@ export const LOCATIONS = [
       "https://maps.google.com/maps?q=7+avenue+Francois+Mitterrand+31800+Saint-Gaudens&t=&z=16&ie=UTF8&iwloc=&output=embed",
     mapsDir:
       "https://www.google.com/maps/dir/?api=1&destination=7+avenue+Francois+Mitterrand+31800+Saint-Gaudens",
-    // TODO horaires a confirmer avec Marie
     hours: [
       { day: 'Lundi', value: 'Fermé', closed: true },
-      { day: 'Mardi', value: '11h30 - 13h30 et 18h00 - 22h00' },
-      { day: 'Mercredi', value: '11h30 - 13h30 et 18h00 - 22h00' },
-      { day: 'Jeudi', value: '11h30 - 13h30 et 18h00 - 22h00' },
-      { day: 'Vendredi', value: '11h30 - 13h30 et 18h00 - 22h00' },
-      { day: 'Samedi', value: '11h30 - 13h30 et 18h00 - 22h00' },
-      { day: 'Dimanche', value: '11h30 - 13h30 et 18h00 - 22h00' },
+      { day: 'Mardi', value: '11h00 - 14h00 et 19h00 - 22h00' },
+      { day: 'Mercredi', value: '11h00 - 14h00 et 19h00 - 22h00' },
+      { day: 'Jeudi', value: '11h00 - 14h00 et 19h00 - 22h00' },
+      { day: 'Vendredi', value: '11h00 - 13h30 et 19h00 - 23h00' },
+      { day: 'Samedi', value: '11h00 - 13h30 et 19h00 - 23h00' },
+      { day: 'Dimanche', value: '11h00 - 13h30 et 19h00 - 23h00' },
     ],
   },
 ];
 
-/* Horaires consolides (utilises par Order.jsx pour les creneaux disponibles).
-   TODO horaires a confirmer avec Marie — on prend le creneau soir 18h00-22h00 pour la demo. */
+/* Horaires consolides Les Pizzas du Soleil (services midi + soir).
+   Mar-Jeu 11h-14h / 19h-22h · Ven-Dim 11h-13h30 / 19h-23h · Lundi ferme.
+   La generation des creneaux est dans Order.jsx (SCHEDULE). */
 export const SERVICE_HOURS = {
   byWeekday: {
-    0: { start: '18:00', end: '22:00' }, // Dimanche
-    1: null,                              // Lundi ferme
-    2: { start: '18:00', end: '22:00' }, // Mardi
-    3: { start: '18:00', end: '22:00' }, // Mercredi
-    4: { start: '18:00', end: '22:00' }, // Jeudi
-    5: { start: '18:00', end: '22:00' }, // Vendredi
-    6: { start: '18:00', end: '22:00' }, // Samedi
+    0: [['11:00', '13:30'], ['19:00', '23:00']], // Dimanche
+    1: null,                                       // Lundi ferme
+    2: [['11:00', '14:00'], ['19:00', '22:00']],  // Mardi
+    3: [['11:00', '14:00'], ['19:00', '22:00']],  // Mercredi
+    4: [['11:00', '14:00'], ['19:00', '22:00']],  // Jeudi
+    5: [['11:00', '13:30'], ['19:00', '23:00']],  // Vendredi
+    6: [['11:00', '13:30'], ['19:00', '23:00']],  // Samedi
   },
   slotMinutes: 15,
 };

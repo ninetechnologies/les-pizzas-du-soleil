@@ -2,8 +2,7 @@ import React from 'react';
 import { motion } from 'motion/react';
 import { LOCATIONS } from '../data/menu.js';
 
-// TODO horaires à confirmer avec Marie
-const HOURS = 'Mardi au dimanche · 11h30 - 13h30 et 18h00 - 22h00 · Fermé le lundi';
+const HOURS = 'Mar-Jeu : 11h-14h et 19h-22h · Ven-Dim : 11h-13h30 et 19h-23h · Fermé le lundi';
 
 export default function Location() {
   return (

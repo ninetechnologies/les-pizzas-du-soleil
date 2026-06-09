@@ -27,51 +27,64 @@ const STEPS = [
 
 const fmt = (n) => n.toFixed(2).replace('.', ',') + ' €';
 
-/* Creneaux bases sur les horaires placeholder Les Pizzas du Soleil.
- * TODO horaires a confirmer avec Marie.
- * Mar-Dim 18h00-22h00 (creneau soir), Lundi ferme. */
+/* Creneaux Les Pizzas du Soleil — services midi + soir, variables selon le jour.
+ * Mar-Jeu : 11h00-14h00 et 19h00-22h00 · Ven-Dim : 11h00-13h30 et 19h00-23h00 · Lundi ferme.
+ * 0=Dim, 1=Lun, ... 6=Sam */
+const SCHEDULE = {
+  0: [['11:00', '13:30'], ['19:00', '23:00']], // Dimanche
+  1: [],                                        // Lundi ferme
+  2: [['11:00', '14:00'], ['19:00', '22:00']], // Mardi
+  3: [['11:00', '14:00'], ['19:00', '22:00']], // Mercredi
+  4: [['11:00', '14:00'], ['19:00', '22:00']], // Jeudi
+  5: [['11:00', '13:30'], ['19:00', '23:00']], // Vendredi
+  6: [['11:00', '13:30'], ['19:00', '23:00']], // Samedi
+};
+
 function generateSlots() {
   const DAY = 24 * 3600 * 1000;
   const now = new Date();
-  // 0=Dim, 1=Lun — Lundi ferme
-  const isClosedDay = (d) => d.getDay() === 1;
-
-  const open = new Date(now); open.setHours(18, 0, 0, 0);
-  const close = new Date(now); close.setHours(22, 0, 0, 0);
-
-  let start = new Date(now.getTime() + 20 * 60 * 1000); // 20 min de prépa mini
-  start.setMinutes(Math.ceil(start.getMinutes() / 15) * 15, 0, 0);
-
-  let dayOffset = 0;
-  // Si aujourd'hui fermé OU déjà après fermeture → on cherche le prochain jour ouvert
-  if (isClosedDay(now) || now > close) {
-    let probe = new Date(now);
-    do {
-      probe = new Date(probe.getTime() + DAY);
-      dayOffset = Math.round((probe - now) / DAY);
-    } while (isClosedDay(probe) && dayOffset < 7);
-    start = new Date(open.getTime() + dayOffset * DAY);
-  } else if (start < open) {
-    start = new Date(open);
-  }
-
-  const lastClose = new Date(close.getTime() + dayOffset * DAY);
-
+  const minStart = new Date(now.getTime() + 20 * 60 * 1000); // 20 min de prépa mini
+  const at = (hhmm, dayOffset) => {
+    const [h, m] = hhmm.split(':').map(Number);
+    const d = new Date(now); d.setHours(h, m, 0, 0);
+    return new Date(d.getTime() + dayOffset * DAY);
+  };
   const slots = [];
-  if (dayOffset === 0) {
-    slots.push({ id: 'asap', label: 'Dès que possible', asap: true, eta: 20 });
-  }
-  const labelDay = dayOffset === 1 ? ' (demain)' : dayOffset > 1 ? ` (${['dim', 'lun', 'mar', 'mer', 'jeu', 'ven', 'sam'][start.getDay()]}.)` : '';
+  let asapDone = false;
 
-  for (let i = 0; i < 10; i++) {
-    const t = new Date(start.getTime() + i * 15 * 60 * 1000);
-    if (t > lastClose) break;
-    slots.push({
-      id: `${t.getDate()}-${t.getHours()}:${t.getMinutes()}`,
-      label: `${t.getHours()}h${String(t.getMinutes()).padStart(2, '0')}${i === 0 ? labelDay : ''}`,
-      time: t,
-      eta: 20 + i * 3,
-    });
+  for (let off = 0; off < 8 && slots.length < 10; off++) {
+    const probe = new Date(now.getTime() + off * DAY);
+    const periods = SCHEDULE[probe.getDay()] || [];
+    const labelDay = off === 1 ? ' (demain)' : off > 1
+      ? ` (${['dim', 'lun', 'mar', 'mer', 'jeu', 'ven', 'sam'][probe.getDay()]}.)` : '';
+
+    for (const [o, c] of periods) {
+      if (slots.length >= 10) break;
+      const open = at(o, off);
+      const close = at(c, off);
+      let start;
+      if (off === 0) {
+        if (minStart > close) continue; // service deja passe aujourd'hui
+        start = minStart < open ? new Date(open) : new Date(minStart);
+        start.setMinutes(Math.ceil(start.getMinutes() / 15) * 15, 0, 0);
+        if (!asapDone && now >= open && now <= close) {
+          slots.push({ id: 'asap', label: 'Dès que possible', asap: true, eta: 20 });
+          asapDone = true;
+        }
+      } else {
+        start = new Date(open);
+      }
+      let first = true;
+      for (let t = new Date(start); t <= close && slots.length < 10; t = new Date(t.getTime() + 15 * 60 * 1000)) {
+        slots.push({
+          id: `${t.getDate()}-${t.getHours()}:${t.getMinutes()}`,
+          label: `${t.getHours()}h${String(t.getMinutes()).padStart(2, '0')}${first ? labelDay : ''}`,
+          time: new Date(t),
+          eta: 20,
+        });
+        first = false;
+      }
+    }
   }
   return slots;
 }

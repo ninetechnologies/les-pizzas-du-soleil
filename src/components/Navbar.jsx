@@ -40,6 +40,8 @@ export default function Navbar() {
             className="z-nav-brand"
             aria-label="Les Pizzas du Soleil - Accueil"
             onClick={(e) => { e.preventDefault(); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+            onDoubleClick={(e) => { e.preventDefault(); window.location.href = '/cuisine'; }}
+            title="Double-clic : accès écran cuisine"
           >
             <Logo size={46} />
           </a>

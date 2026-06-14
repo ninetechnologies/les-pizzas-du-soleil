@@ -105,9 +105,8 @@ export default function Order() {
   const [addressLoading, setAddressLoading] = useState(false);
   const [selectedSlot, setSelectedSlot] = useState(null);
   const [orderCode, setOrderCode] = useState(null);
-  const [paying, setPaying] = useState(false);
-  const [mode, setMode] = useState('place'); // 'place' | 'emporter' | 'livraison'
-  const [payment, setPayment] = useState('carte'); // 'carte' | 'especes'
+  const [mode, setMode] = useState('place'); // 'place' | 'emporter'
+  const payment = 'place'; // paiement sur place uniquement (pas de paiement en ligne)
   const [liveStatus, setLiveStatus] = useState('recue'); // suivi temps réel côté client
   const [loyalty, setLoyalty] = useState(null); // carte de fidélité (résultat après commande)
   const slots = generateSlots();
@@ -186,37 +185,29 @@ export default function Order() {
   const canGoToPayment = selectedSlot !== null;
 
   const handlePay = () => {
-    const finish = () => {
-      const code = 'PDS-' + Math.floor(1000 + Math.random() * 9000);
-      placeOrder({
-        code,
-        status: 'recue',
-        mode,
-        modeLabel,
-        payment,
-        name: `${address.firstName} ${address.lastName}`.trim(),
-        phone: address.phone,
-        address: isDelivery && selectedAddress ? selectedAddress.label : null,
-        note: address.note,
-        slot: selectedSlot ? selectedSlot.label : null,
-        items: items.map((it) => ({
-          name: it.name, qty: it.qty || 1, price: it.price, size: it.size || null,
-          removed: it.removed || [], extras: it.extras || [],
-        })),
-        total: total + deliveryFee,
-        createdAt: Date.now(),
-      });
-      setLoyalty(addStamp(address.phone));
-      setOrderCode(code);
-      setPaying(false);
-      setStep('success');
-    };
-    if (payment === 'especes') {
-      finish(); // pas de paiement en ligne, on confirme la commande
-    } else {
-      setPaying(true);
-      setTimeout(finish, 1600);
-    }
+    // Pas de paiement en ligne : on confirme la commande, reglement sur place.
+    const code = 'PDS-' + Math.floor(1000 + Math.random() * 9000);
+    placeOrder({
+      code,
+      status: 'recue',
+      mode,
+      modeLabel,
+      payment,
+      name: `${address.firstName} ${address.lastName}`.trim(),
+      phone: address.phone,
+      address: isDelivery && selectedAddress ? selectedAddress.label : null,
+      note: address.note,
+      slot: selectedSlot ? selectedSlot.label : null,
+      items: items.map((it) => ({
+        name: it.name, qty: it.qty || 1, price: it.price, size: it.size || null,
+        removed: it.removed || [], extras: it.extras || [],
+      })),
+      total: total + deliveryFee,
+      createdAt: Date.now(),
+    });
+    setLoyalty(addStamp(address.phone));
+    setOrderCode(code);
+    setStep('success');
   };
 
   const handleReset = () => {
@@ -676,65 +667,26 @@ export default function Order() {
                   </div>
                 </div>
 
-                <div className="z-pay-label">Mode de paiement</div>
-                <div className="z-payment-methods">
-                  <button type="button" className="z-payment-method" data-active={payment === 'carte'} onClick={() => setPayment('carte')}>
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
-                      <rect x="2" y="5" width="20" height="14" rx="2" />
-                      <line x1="2" y1="10" x2="22" y2="10" />
-                    </svg>
-                    <div>
-                      <strong>Carte bancaire</strong>
-                      <small>Paiement sécurisé en ligne · 3D Secure</small>
-                    </div>
-                    <span className="z-payment-radio" />
-                  </button>
-                  <button type="button" className="z-payment-method" data-active={payment === 'especes'} onClick={() => setPayment('especes')}>
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
-                      <rect x="2" y="6" width="20" height="12" rx="2" />
-                      <circle cx="12" cy="12" r="2.5" />
-                    </svg>
-                    <div>
-                      <strong>Espèces</strong>
-                      <small>{isDelivery ? 'À régler à la livraison' : 'À régler sur place'}</small>
-                    </div>
-                    <span className="z-payment-radio" />
-                  </button>
+                <div className="z-pay-label">Paiement</div>
+                <div className="z-pay-onsite">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M3 11l9-8 9 8M5 10v10h14V10" />
+                  </svg>
+                  <div>
+                    <strong>Paiement sur place</strong>
+                    <small>{mode === 'emporter' ? 'À régler au comptoir, à la récupération.' : 'À régler directement au restaurant.'}</small>
+                  </div>
                 </div>
 
                 <div className="z-step-actions">
-                  <button
-                    className="z-btn-ghost-dark"
-                    onClick={() => setStep('time')}
-                    disabled={paying}
-                  >
+                  <button className="z-btn-ghost-dark" onClick={() => setStep('time')}>
                     Retour
                   </button>
-                  <button
-                    className="z-btn z-btn-primary z-btn-pay"
-                    onClick={handlePay}
-                    disabled={paying}
-                  >
-                    {paying ? (
-                      <>
-                        <span className="z-spinner" />
-                        Connexion sécurisée...
-                      </>
-                    ) : payment === 'especes' ? (
-                      <>
-                        Confirmer la commande · {fmt(total + deliveryFee)}
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
-                          <path d="M5 12l5 5L20 7" />
-                        </svg>
-                      </>
-                    ) : (
-                      <>
-                        Payer {fmt(total + deliveryFee)}
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
-                          <path d="M5 12l5 5L20 7" />
-                        </svg>
-                      </>
-                    )}
+                  <button className="z-btn z-btn-primary z-btn-pay" onClick={handlePay}>
+                    Confirmer la commande · {fmt(total + deliveryFee)}
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+                      <path d="M5 12l5 5L20 7" />
+                    </svg>
                   </button>
                 </div>
               </motion.div>
@@ -778,11 +730,7 @@ export default function Order() {
                   </div>
                   <div>
                     <span>Paiement</span>
-                    <strong>
-                      {payment === 'especes'
-                        ? `À régler · ${fmt(total + deliveryFee)}`
-                        : `Encaissé · ${fmt(total + deliveryFee)}`}
-                    </strong>
+                    <strong>Sur place · {fmt(total + deliveryFee)}</strong>
                   </div>
                 </div>
 
@@ -1351,55 +1299,6 @@ export default function Order() {
           font-weight: 800;
           color: var(--z-black);
         }
-        .z-payment-methods {
-          display: flex;
-          flex-direction: column;
-          gap: 10px;
-        }
-        .z-payment-method {
-          display: flex;
-          align-items: center;
-          gap: 14px;
-          padding: 16px 18px;
-          background: var(--z-cream);
-          border: 1.5px solid var(--z-border);
-          border-radius: 14px;
-          color: var(--z-text);
-          width: 100%;
-          text-align: left;
-          cursor: pointer;
-          transition: all 0.2s var(--z-ease);
-        }
-        .z-payment-method:hover { border-color: var(--z-charcoal); }
-        .z-payment-method[data-active="true"] {
-          border-color: var(--z-green);
-          background: rgba(36, 28, 24, 0.05);
-        }
-        .z-payment-method strong {
-          display: block;
-          font-weight: 600;
-          font-size: 0.95rem;
-        }
-        .z-payment-method small {
-          display: block;
-          font-size: 0.74rem;
-          color: var(--z-text-muted);
-        }
-        .z-payment-method > div {
-          flex: 1;
-        }
-        .z-payment-radio {
-          width: 20px;
-          height: 20px;
-          border-radius: 50%;
-          border: 2px solid var(--z-border);
-          flex-shrink: 0;
-          transition: all 0.2s;
-        }
-        .z-payment-method[data-active="true"] .z-payment-radio {
-          border-color: var(--z-green);
-          background: radial-gradient(circle at center, var(--z-green) 0 6px, transparent 6.5px);
-        }
         .z-pay-label {
           font-family: var(--z-font-display);
           font-weight: 700;
@@ -1407,6 +1306,19 @@ export default function Order() {
           color: var(--z-black);
           margin: 8px 0 12px;
         }
+        .z-pay-onsite {
+          display: flex;
+          align-items: center;
+          gap: 14px;
+          padding: 16px 18px;
+          background: var(--z-cream);
+          border: 1.5px solid var(--z-green);
+          border-radius: 14px;
+          color: var(--z-text);
+        }
+        .z-pay-onsite > svg { color: var(--z-green); flex-shrink: 0; }
+        .z-pay-onsite strong { display: block; font-weight: 600; font-size: 0.95rem; }
+        .z-pay-onsite small { display: block; font-size: 0.74rem; color: var(--z-text-muted); }
         .z-mode {
           display: grid;
           grid-template-columns: repeat(2, 1fr);
@@ -1437,17 +1349,6 @@ export default function Order() {
         }
         .z-btn-pay {
           min-width: 180px;
-        }
-        .z-spinner {
-          width: 16px;
-          height: 16px;
-          border-radius: 50%;
-          border: 2px solid rgba(255, 255, 255, 0.3);
-          border-top-color: var(--z-white);
-          animation: z-spin 0.6s linear infinite;
-        }
-        @keyframes z-spin {
-          to { transform: rotate(360deg); }
         }
 
         /* Success */

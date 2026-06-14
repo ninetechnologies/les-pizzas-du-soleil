@@ -136,7 +136,7 @@ export default function Kitchen({ onLogout }) {
                 <div className="z-tk-meta">
                   {o.name && <span>{o.name}</span>}
                   {o.slot && <span>· {o.slot}</span>}
-                  <span className="z-tk-pay" data-pay={o.payment}>{o.payment === 'especes' ? 'Espèces' : 'Carte'}</span>
+                  <span className="z-tk-pay" data-pay={o.payment}>{o.payment === 'place' ? 'Sur place' : o.payment === 'especes' ? 'Espèces' : 'Carte'}</span>
                 </div>
                 <ul className="z-tk-items">
                   {o.items.map((it, i) => (
@@ -253,7 +253,7 @@ export default function Kitchen({ onLogout }) {
             ))}
             <div className="pds-tk-rule" />
             <div className="pds-tk-line pds-tk-total"><b>TOTAL</b><b>{fmt(ticket.total)}</b></div>
-            <div className="pds-tk-line"><span>Paiement</span><span>{ticket.payment === 'especes' ? 'ESPÈCES' : 'CARTE'}</span></div>
+            <div className="pds-tk-line"><span>Paiement</span><span>{ticket.payment === 'place' ? 'SUR PLACE' : ticket.payment === 'especes' ? 'ESPÈCES' : 'CARTE'}</span></div>
             <div className="pds-tk-foot">Merci et à bientôt !</div>
           </div>
         )}
@@ -297,6 +297,7 @@ export default function Kitchen({ onLogout }) {
         .z-tk-time { margin-left: auto; font-size: .82rem; color: rgba(255,255,255,.55); font-variant-numeric: tabular-nums; }
         .z-tk-meta { display: flex; flex-wrap: wrap; gap: 6px; font-size: .8rem; color: rgba(255,255,255,.7); align-items: center; }
         .z-tk-pay { margin-left: auto; font-weight: 700; font-size: .7rem; padding: 2px 8px; border-radius: 999px; }
+        .z-tk-pay[data-pay="place"] { background: rgba(247,168,30,.18); color: #f5c372; }
         .z-tk-pay[data-pay="especes"] { background: rgba(247,168,30,.18); color: #f5c372; }
         .z-tk-pay[data-pay="carte"] { background: rgba(99,179,237,.18); color: #9cd0f5; }
         .z-tk-items { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 7px; }

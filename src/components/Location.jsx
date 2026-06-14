@@ -1,8 +1,6 @@
 import React from 'react';
 import { motion } from 'motion/react';
-import { LOCATIONS } from '../data/menu.js';
-
-const HOURS = 'Mar-Jeu : 11h-14h et 19h-22h · Ven-Sam : 11h-14h et 19h-23h · Dim : 19h-23h · Fermé le lundi';
+import { LOCATIONS, HOURS_SHORT } from '../data/menu.js';
 
 export default function Location() {
   return (
@@ -20,8 +18,8 @@ export default function Location() {
             Au cœur <em>de Saint-Gaudens</em>.
           </h2>
           <p className="z-location-intro">
-            Des pizzas généreuses, faites maison. À déguster sur place, à emporter
-            ou en livraison, au 7 avenue François Mitterrand.
+            Des pizzas généreuses, faites maison. À déguster sur place ou
+            à emporter, au 7 avenue François Mitterrand.
           </p>
         </motion.div>
 
@@ -40,7 +38,7 @@ export default function Location() {
               <div className="z-loc-info">
                 <h3>{loc.name}</h3>
                 <p className="z-loc-addr">{loc.address}<br />{loc.zip}</p>
-                <p className="z-loc-hours">{HOURS}</p>
+                <p className="z-loc-hours">{HOURS_SHORT}</p>
                 <div className="z-loc-buttons">
                   <a href={`tel:${loc.telHref}`} className="z-btn z-btn-primary z-loc-btn">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round">

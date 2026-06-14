@@ -22,6 +22,8 @@ const cardVariants = {
 
 const fmt = (n) => n.toFixed(2).replace('.', ',') + ' €';
 const slug = (s) => s.toLowerCase().normalize('NFD').replace(/[^a-z0-9]+/g, '-');
+// Pizzas multi-tailles : on affiche "dès <plus petit prix>"
+const priceLabel = (it) => (it.sizes && it.sizes.length ? 'dès ' + fmt(it.price) : fmt(it.price));
 
 export default function Menu() {
   const [justAdded, setJustAdded] = useState(null);
@@ -34,9 +36,17 @@ export default function Menu() {
     setTimeout(() => setJustAdded(null), 1100);
   };
 
-  const openCustomizer = (name, price, image, cat) => {
-    const cfg = customConfig(name, cat);
-    setCustomizing({ id: slug(name), name, price, image: image || '/logo.png', ...cfg });
+  const openCustomizer = (src, image, cat) => {
+    const cfg = customConfig(src.name, cat);
+    setCustomizing({
+      id: slug(src.name),
+      name: src.name,
+      desc: src.desc,
+      price: src.price,
+      sizes: src.sizes,
+      image: image || '/logo.png',
+      ...cfg,
+    });
   };
 
   const onCustomConfirm = (cartItem) => {
@@ -96,7 +106,7 @@ export default function Menu() {
                 <p className="z-pizza-ingredients">{dish.desc}</p>
                 <div className="z-pizza-actions">
                   {customConfig(dish.name) ? (
-                    <button className="z-pizza-add" onClick={() => openCustomizer(dish.name, dish.price, dish.image)}>
+                    <button className="z-pizza-add" onClick={() => openCustomizer(dish, dish.image)}>
                       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 6h18M3 12h18M3 18h18" /><circle cx="7" cy="6" r="1.6" fill="currentColor" /><circle cx="14" cy="12" r="1.6" fill="currentColor" /><circle cx="10" cy="18" r="1.6" fill="currentColor" /></svg>
                       Personnaliser
                     </button>
@@ -115,7 +125,7 @@ export default function Menu() {
                       )}
                     </button>
                   )}
-                  <span className="z-pizza-price">{fmt(dish.price)}</span>
+                  <span className="z-pizza-price">{priceLabel(dish)}</span>
                 </div>
               </div>
             </motion.article>
@@ -158,11 +168,11 @@ export default function Menu() {
                       </div>
                       <button
                         className="z-carte-add"
-                        onClick={() => customConfig(it.name, section.cat) ? openCustomizer(it.name, it.price, it.img, section.cat) : add(item, it.img)}
+                        onClick={() => customConfig(it.name, section.cat) ? openCustomizer(it, it.img, section.cat) : add(item, it.img)}
                         data-success={justAdded === id}
                         aria-label={`${customConfig(it.name, section.cat) ? 'Personnaliser' : 'Ajouter'} ${it.name}`}
                       >
-                        <span className="z-carte-price">{fmt(it.price)}</span>
+                        <span className="z-carte-price">{priceLabel(it)}</span>
                         {justAdded === id ? (
                           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round"><path d="M20 6L9 17l-5-5" /></svg>
                         ) : (
@@ -178,7 +188,7 @@ export default function Menu() {
         </div>
 
         <p className="z-menu-note">
-          Toutes nos pizzas sont personnalisables : taille (petite ou normale) et
+          Toutes nos pizzas sont personnalisables : taille (26, 33 ou 40 cm) et
           suppléments au choix.
         </p>
       </div>

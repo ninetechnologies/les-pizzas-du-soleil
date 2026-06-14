@@ -1,97 +1,129 @@
-/* CARTE PROVISOIRE / PLACEHOLDER — en attente de la vraie carte de Marie (pizzas + prix). A remplacer. */
-
-/**
- * Donnees de menu — Les Pizzas du Soleil, Saint-Gaudens.
- * Toutes les valeurs marquees "TODO" sont a confirmer avec Marie.
+/* Carte reelle Les Pizzas du Soleil — saisie depuis le menu PDF fourni par Marie (14/06/2026).
+ * 3 tailles par pizza : 26 cm / 33 cm / 40 cm, avec un prix fixe par taille.
+ * Retouches verbales de Marie (14/06, a affiner au RDV) :
+ *   - "Viando" renommee "Reine"
+ *   - "Pita" renommee "Pilita" (poissons)
+ *   - ajout d'une pizza "Rougail Saucisse" (compo + prix a confirmer)
  */
 
 const pi = (s) => `/images/pizzas/${s}`;
 const ai = (s) => `/images/ambiance/${s}`;
 
+/* Construit les 3 tailles d'une pizza a partir des 3 prix (26 / 33 / 40 cm). */
+const sz = (p26, p33, p40) => [
+  { id: '26', label: '26 cm', sub: 'Individuelle', price: p26 },
+  { id: '33', label: '33 cm', sub: 'Moyenne', price: p33 },
+  { id: '40', label: '40 cm', sub: 'Familiale', price: p40 },
+];
+
+/* Taille affichee par defaut dans le customizer */
+export const DEFAULT_SIZE_ID = '33';
+
 export const FEATURED = [
   {
-    id: 'la-soleil',
-    name: 'La Soleil',
-    desc: "Base tomate, mozza fior di latte, basilic frais. La signature de la maison.",
-    price: 14,
-    image: pi('hero-mozza.jpg'),
+    id: 'le-soleil',
+    name: 'Le Soleil',
+    desc: "Tomate, emmental, bouchons, oignon, gros piment, olive.",
+    price: 7.5,
+    sizes: sz(7.5, 13.5, 16.5),
+    image: pi('hero-mozza.jpg'), // photo provisoire, a remplacer par la vraie
     signature: true,
   },
   {
-    id: 'la-blanche',
-    name: 'La Blanche',
-    desc: "Crème fraîche, mozza, pesto maison, basilic.",
-    price: 13,
-    image: pi('blanche-pesto.jpg'),
-    signature: true,
+    id: 'reine',
+    name: 'Reine',
+    desc: "Tomate, emmental, jambon, olive.",
+    price: 6.5,
+    sizes: sz(6.5, 12.5, 15),
+    image: pi('regina.jpg'),
+    popular: true,
   },
   {
-    id: 'l-orientale',
-    name: "L'Orientale",
-    desc: "Base tomate, merguez maison, jalapeños, poivrons, oignons.",
-    price: 14,
+    id: 'orientale',
+    name: 'Orientale',
+    desc: "Tomate, emmental, poivron, merguez, olive.",
+    price: 6.5,
+    sizes: sz(6.5, 12.5, 15),
     image: pi('orientale-merguez.jpg'),
     popular: true,
   },
   {
-    id: 'la-norvegienne',
-    name: 'La Norvégienne',
-    desc: "Crème fraîche, saumon fumé, champignons, aneth.",
-    price: 15,
+    id: 'norvegienne',
+    name: 'Norvégienne',
+    desc: "Tomate, emmental, saumon, citron, crème fraîche.",
+    price: 8,
+    sizes: sz(8, 13, 15),
     image: pi('norvegienne-saumon.jpg'),
     signature: true,
   },
   {
-    id: 'margherita',
-    name: 'Margherita',
-    desc: "Base tomate, mozza, basilic, huile d'olive. Le grand classique.",
-    price: 10,
-    image: pi('margherita.jpg'),
+    id: 'chevre-miel',
+    name: 'Chèvre-Miel',
+    desc: "Tomate, emmental, chèvre, miel, olive.",
+    price: 8.5,
+    sizes: sz(8.5, 13, 15),
+    image: pi('chevre-miel.jpg'),
   },
   {
-    id: 'chevre-miel',
-    name: 'Chèvre Miel',
-    desc: "Crème fraîche, bûche de chèvre, miel, noix, romarin.",
-    price: 12,
-    image: pi('chevre-miel.jpg'),
-    popular: true,
+    id: '4-fromages',
+    name: '4 Fromages',
+    desc: "Tomate, emmental, roquefort, chèvre, raclette, oignon, crème fraîche.",
+    price: 8.5,
+    sizes: sz(8.5, 13, 15),
+    image: pi('4-fromages.jpg'),
   },
 ];
 
 export const CARTE = [
   {
-    cat: 'Les Signatures',
+    cat: 'Pizzas Viandes',
     items: [
-      { name: 'La Soleil', desc: "Base tomate, mozza fior di latte, basilic frais.", price: 14, img: pi('hero-mozza.jpg') },
-      { name: 'La Blanche', desc: "Crème fraîche, mozza, pesto maison, basilic.", price: 13, img: pi('blanche-pesto.jpg') },
-      { name: "L'Orientale", desc: "Base tomate, merguez maison, jalapeños, poivrons, oignons.", price: 14, img: pi('orientale-merguez.jpg') },
-      { name: 'La Norvégienne', desc: "Crème fraîche, saumon fumé, champignons, aneth.", price: 15, img: pi('norvegienne-saumon.jpg') },
+      { name: 'Reine', desc: "Tomate, emmental, jambon, olive.", price: 6.5, sizes: sz(6.5, 12.5, 15), img: pi('regina.jpg') },
+      { name: 'Roma', desc: "Tomate, emmental, jambon, merguez, œuf, olive.", price: 7.5, sizes: sz(7.5, 13, 16) },
+      { name: 'Hawaïenne', desc: "Tomate, emmental, poulet, ananas, olive.", price: 7, sizes: sz(7, 13, 16) },
+      { name: 'Pépéronna', desc: "Tomate, mozzarella, chorizo, olive.", price: 7, sizes: sz(7, 13, 16), img: pi('piccante.jpg') },
+      { name: 'Campagnarde', desc: "Tomate, emmental, lardon, chèvre, olive.", price: 6.5, sizes: sz(6.5, 12.5, 15) },
+      { name: 'Alsacienne', desc: "Crème fraîche, emmental, pomme de terre, oignons, lardons, olive.", price: 6.5, sizes: sz(6.5, 12.5, 15), img: pi('carbonara.jpg') },
+      { name: 'Casa Blanca', desc: "Crème fraîche, champignons, lardons, chèvre, miel, mozzarella.", price: 7, sizes: sz(7, 13, 16), img: pi('cremosa.jpg') },
+      { name: 'Orientale', desc: "Tomate, emmental, poivron, merguez, olive.", price: 6.5, sizes: sz(6.5, 12.5, 15), img: pi('orientale-merguez.jpg') },
+      { name: 'Chicken', desc: "Tomate, emmental, poivron, poulet, crème fraîche, olive.", price: 7, sizes: sz(7, 13, 16) },
+      { name: 'Créole', desc: "Tomate, emmental, saucisse fumée, oignon, gros piment, olive.", price: 7.5, sizes: sz(7.5, 13.5, 16.5) },
+      { name: 'Le Soleil', desc: "Tomate, emmental, bouchons, oignon, gros piment, olive.", price: 7.5, sizes: sz(7.5, 13.5, 16.5), img: pi('hero-mozza.jpg') },
+      { name: 'Forestière', desc: "Tomate, emmental, champignons, lardons, pomme de terre, olive.", price: 7, sizes: sz(7, 13, 16), img: pi('tartufo.jpg') },
+      { name: 'Spéciale', desc: "Tomate, emmental, jambon, chorizo, merguez, lardons, poivron.", price: 7, sizes: sz(7, 13, 16) },
+      { name: 'P. Saucisse', desc: "Tomate, emmental, saucisse épicée.", price: 7, sizes: sz(7, 13, 16) },
+      // Ajout demande par Marie le 14/06 — composition et prix a confirmer au RDV.
+      { name: 'Rougail Saucisse', desc: "Tomate, emmental, saucisse, sauce rougail, oignon, gros piment.", price: 7.5, sizes: sz(7.5, 13.5, 16.5) },
     ],
   },
   {
-    cat: 'Les Classiques',
+    cat: 'Pizzas Fromages & Légumes',
     items: [
-      { name: 'Margherita', desc: "Base tomate, mozza, basilic, huile d'olive.", price: 10, img: pi('margherita.jpg') },
-      { name: 'Reine', desc: "Base tomate, jambon, mozza, champignons, origan.", price: 11, img: pi('regina.jpg') },
-      { name: '4 Fromages', desc: "Crème, mozza, emmental, chèvre, gorgonzola.", price: 12, img: pi('4-fromages.jpg') },
-      { name: 'Végétarienne', desc: "Base tomate, mozza, poivrons, courgettes, champignons, olives.", price: 11 },
-      { name: 'Chèvre Miel', desc: "Crème fraîche, bûche de chèvre, miel, noix, romarin.", price: 12, img: pi('chevre-miel.jpg') },
+      { name: 'Margherita', desc: "Tomate, emmental, olive.", price: 7, sizes: sz(7, 10, 13), img: pi('margherita.jpg') },
+      { name: 'Chèvre-Miel', desc: "Tomate, emmental, chèvre, miel, olive.", price: 8.5, sizes: sz(8.5, 13, 15), img: pi('chevre-miel.jpg') },
+      { name: '4 Fromages', desc: "Tomate, emmental, roquefort, chèvre, raclette, oignon, crème fraîche.", price: 8.5, sizes: sz(8.5, 13, 15), img: pi('4-fromages.jpg') },
+      { name: 'Végétarienne', desc: "Tomate, emmental, champignons, poivrons verts, oignon, œuf, persillade.", price: 7, sizes: sz(7, 13, 15) },
+      { name: 'La Fermière', desc: "Tomate, mozzarella, champignons, œuf, persillade, olive.", price: 8, sizes: sz(8, 13.5, 15) },
     ],
   },
   {
-    cat: 'Les Gourmandes',
+    cat: 'Pizzas Poissons',
     items: [
-      { name: 'Calzone', desc: "Pizza pliée : base tomate, mozza, jambon, champignons.", price: 13 },
-      { name: 'Tartiflette', desc: "Crème, pomme de terre, compotée d'oignons, reblochon.", price: 14, img: pi('tartiflette.jpg') },
-      { name: 'Campione', desc: "Base tomate, mozza, pepperoni, piments doux, olives.", price: 13 },
-      { name: 'BBQ Poulet', desc: "Sauce BBQ, mozza, poulet grillé, oignons, poivrons.", price: 13 },
+      { name: 'Pêcheur', desc: "Tomate, emmental, thon, oignon, olive.", price: 8, sizes: sz(8, 13, 15) },
+      // "Pita" renommee "Pilita" a la demande de Marie (14/06).
+      { name: 'Pilita', desc: "Tomate, emmental, rillettes de sardines au citron, crème fraîche.", price: 8.5, sizes: sz(8.5, 14.5, 16.5) },
+      { name: 'Sardine', desc: "Tomate, emmental, salade de sardines, oignon, gros piment.", price: 7, sizes: sz(7, 10.5, 13) },
+      { name: 'Océane', desc: "Tomate, emmental, saumon, crevettes, moules, citron, crème fraîche.", price: 8.5, sizes: sz(8.5, 14, 16.5) },
+      { name: 'Norvégienne', desc: "Tomate, emmental, saumon, citron, crème fraîche.", price: 8, sizes: sz(8, 13, 15), img: pi('norvegienne-saumon.jpg') },
+      { name: 'Napolitaine', desc: "Tomate, emmental, anchois, olives.", price: 7, sizes: sz(7, 14, 15.5) },
     ],
   },
   {
+    // Hors PDF — desserts a confirmer avec Marie au RDV.
     cat: 'Desserts maison',
     items: [
       { name: 'Tiramisu', desc: "Tiramisu maison : biscuits, crème mascarpone, cacao.", price: 5 },
-      { name: 'Cookie maison', desc: "Cookie aux pépites de chocolat, sorti du four.", price: 4 },
+      { name: 'Cookie maison', desc: "Cookie aux pépites de chocolat, sorti du four.", price: 4, img: pi('cookie-pistache.jpg') },
       { name: 'Nutella maison', desc: "Pizza dessert : pâte maison, Nutella, sucre glacé.", price: 5 },
     ],
   },
@@ -104,22 +136,20 @@ export const PIZZA_DU_MOMENT = {
   image: ai('galerie-1.jpg'),
 };
 
-/* Options de personnalisation */
+/* Options de personnalisation.
+ * Les tailles/prix sont desormais portes par chaque pizza (champ `sizes`).
+ * `tailles` reste expose en repli pour d'eventuels composants generiques. */
 export const PIZZA_OPTIONS = {
-  // TODO confirmer les tailles et le systeme de prix avec Marie
-  tailles: [
-    { id: 'petite', label: 'Petite', factor: 0.85, sub: '-15 %' },
-    { id: 'normale', label: 'Normale', factor: 1, sub: 'Format standard' },
-  ],
+  tailles: sz(0, 0, 0), // repli : les vrais prix viennent de item.sizes
   // TODO confirmer les supplements et prix avec Marie
   supplements: [
     { label: 'Olives', price: 1.0 },
     { label: 'Œuf', price: 1.0 },
     { label: 'Champignons', price: 1.5 },
+    { label: 'Emmental', price: 2.0 },
     { label: 'Mozzarella', price: 2.0 },
-    { label: 'Légumes grillés', price: 2.0 },
     { label: 'Charcuterie / Viande', price: 2.5 },
-    { label: 'Burrata', price: 3.5 },
+    { label: 'Gros piment', price: 1.0 },
   ],
 };
 
@@ -151,6 +181,8 @@ export const LOCATIONS = [
       "https://maps.google.com/maps?q=7+avenue+Francois+Mitterrand+31800+Saint-Gaudens&t=&z=16&ie=UTF8&iwloc=&output=embed",
     mapsDir:
       "https://www.google.com/maps/dir/?api=1&destination=7+avenue+Francois+Mitterrand+31800+Saint-Gaudens",
+    // NOTE : le PDF de Marie indique Ven-Sam 18h30-22h15 et Dim 18h30-22h00 (sans service midi).
+    // Conserve ici les horaires confirmes le 09/06 (avec service midi) — a trancher au RDV.
     hours: [
       { day: 'Lundi', value: 'Fermé', closed: true },
       { day: 'Mardi', value: '11h00 - 14h00 et 19h00 - 22h00' },
@@ -163,8 +195,14 @@ export const LOCATIONS = [
   },
 ];
 
+/* Horaires en version courte pour l'affichage (Location). Source unique : a garder
+   en phase avec LOCATIONS.hours et SERVICE_HOURS ci-dessous si Marie change ses horaires. */
+export const HOURS_SHORT =
+  'Mar-Jeu : 11h-14h et 19h-22h · Ven-Sam : 11h-14h et 19h-23h · Dim : 19h-23h · Fermé le lundi';
+
 /* Horaires consolides Les Pizzas du Soleil (services midi + soir).
-   Mar-Jeu 11h-14h / 19h-22h · Ven-Dim 11h-13h30 / 19h-23h · Lundi ferme.
+   Mar-Jeu 11h-14h / 19h-22h · Ven-Sam 11h-14h / 19h-23h · Dim 19h-23h · Lundi ferme.
+   (Le PDF carte indique des horaires soir uniquement Ven-Dim — a confirmer au RDV.)
    La generation des creneaux est dans Order.jsx (SCHEDULE). */
 export const SERVICE_HOURS = {
   byWeekday: {
@@ -179,11 +217,10 @@ export const SERVICE_HOURS = {
   slotMinutes: 15,
 };
 
-/* Modes de commande */
+/* Modes de commande — Les Pizzas du Soleil : sur place et a emporter uniquement (pas de livraison). */
 export const ORDER_MODES = [
   { id: 'sur-place', label: 'Sur place', desc: 'Venez déguster sur place.', icon: 'M3 11l9-8 9 8M5 10v10h14V10' },
   { id: 'emporter', label: 'À emporter', desc: 'Préparée, prête à récupérer au comptoir.', icon: 'M6 2l1 4h10l1-4M5 6h14l-1 15H6L5 6z' },
-  { id: 'livraison', label: 'Livraison', desc: 'Livraison à domicile, sans commission.', icon: 'M1 3h15v13H1zM16 8h4l3 3v5h-7V8z' },
 ];
 
 /* Reseaux sociaux — TODO renseigner les vrais liens avec Marie */

@@ -24,9 +24,9 @@ export default function Footer() {
           <div className="z-footer-col">
             <h4>Notre carte</h4>
             <ul>
-              <li><a href="#menu">Les Signatures</a></li>
-              <li><a href="#menu">Les Classiques</a></li>
-              <li><a href="#menu">Les Gourmandes</a></li>
+              <li><a href="#menu">Pizzas Viandes</a></li>
+              <li><a href="#menu">Pizzas Fromages &amp; Légumes</a></li>
+              <li><a href="#menu">Pizzas Poissons</a></li>
               <li><a href="#menu">Desserts maison</a></li>
             </ul>
           </div>
@@ -35,7 +35,7 @@ export default function Footer() {
             <h4>Commander</h4>
             <ul>
               <li><a href="#commander">En direct (sans commission)</a></li>
-              <li><a href="#commander">Livraison à domicile</a></li>
+              <li><a href="#commander">Sur place &amp; à emporter</a></li>
               {/* TODO confirmer tel pizzeria avec Marie */}
               <li><a href="tel:+33561943329">Saint-Gaudens · 05 61 94 33 29</a></li>
             </ul>

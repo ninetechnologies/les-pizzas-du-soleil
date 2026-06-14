@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { PIZZA_OPTIONS } from '../data/menu.js';
+import { PIZZA_OPTIONS, DEFAULT_SIZE_ID } from '../data/menu.js';
 
 /**
  * PizzaCustomizer Les Pizzas du Soleil (le fichier garde le nom historique TacosCustomizer.jsx
@@ -11,7 +11,7 @@ import { PIZZA_OPTIONS } from '../data/menu.js';
  * onClose() - ferme la modale sans rien ajouter (signature attendue par Menu.jsx).
  *
  * Options proposees :
- *  - Taille : Petite (-15 %) ou Normale
+ *  - Taille : 26 cm / 33 cm / 40 cm (prix fixe par taille, porte par item.sizes)
  *  - Supplements (a confirmer avec Marie)
  */
 const BASES = [
@@ -20,20 +20,27 @@ const BASES = [
 ];
 
 export default function TacosCustomizer({ item, onClose, onConfirm }) {
-  const [baseId, setBaseId] = useState('tomate');
-  const [sizeId, setSizeId] = useState('normale');
+  // Tailles reelles de la pizza (repli sur PIZZA_OPTIONS si jamais l'item n'en porte pas)
+  const sizes = item.sizes && item.sizes.length ? item.sizes : PIZZA_OPTIONS.tailles;
+  const defaultSize = sizes.find((s) => s.id === DEFAULT_SIZE_ID) || sizes[Math.floor(sizes.length / 2)] || sizes[0];
+
+  // Base par defaut deduite de la recette (les pizzas crème commencent par "Crème ...")
+  const inferredBase = /^cr[eè]me/i.test(item.desc || '') ? 'creme' : 'tomate';
+
+  const [baseId, setBaseId] = useState(inferredBase);
+  const [sizeId, setSizeId] = useState(defaultSize.id);
   const [supps, setSupps] = useState([]); // [{label, price}, ...]
 
   const sizeObj = useMemo(
-    () => PIZZA_OPTIONS.tailles.find((t) => t.id === sizeId) || PIZZA_OPTIONS.tailles[1],
-    [sizeId]
+    () => sizes.find((t) => t.id === sizeId) || defaultSize,
+    [sizes, sizeId, defaultSize]
   );
 
   const finalPrice = useMemo(() => {
-    const base = item.price * sizeObj.factor;
+    const base = sizeObj.price;
     const extras = supps.reduce((s, x) => s + x.price, 0);
     return base + extras;
-  }, [item.price, sizeObj, supps]);
+  }, [sizeObj, supps]);
 
   const toggleSupp = (s) => {
     setSupps((prev) =>
@@ -51,7 +58,7 @@ export default function TacosCustomizer({ item, onClose, onConfirm }) {
       name: item.name,
       size: sizeObj.label,
       base: baseId,
-      baseChanged: baseId !== 'tomate',
+      baseChanged: baseId !== inferredBase,
       price: finalPrice,
       image: item.image,
       extras: supps.map((s) => ({ label: s.label, price: s.price })),
@@ -117,8 +124,8 @@ export default function TacosCustomizer({ item, onClose, onConfirm }) {
           {/* Taille */}
           <div className="v-cz-group">
             <div className="v-cz-glabel"><span>Taille</span><em>Choisir</em></div>
-            <div className="v-cz-sizes">
-              {PIZZA_OPTIONS.tailles.map((t) => (
+            <div className="v-cz-sizes v-cz-sizes-3">
+              {sizes.map((t) => (
                 <button
                   key={t.id}
                   className="v-cz-size"
@@ -127,7 +134,7 @@ export default function TacosCustomizer({ item, onClose, onConfirm }) {
                 >
                   <span className="v-cz-size-label">{t.label}</span>
                   <span className="v-cz-size-sub">{t.sub}</span>
-                  <span className="v-cz-size-price">{fmt(item.price * t.factor)}</span>
+                  <span className="v-cz-size-price">{fmt(t.price)}</span>
                 </button>
               ))}
             </div>
@@ -236,6 +243,10 @@ export default function TacosCustomizer({ item, onClose, onConfirm }) {
         .v-cz-sizes {
           display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
         }
+        .v-cz-sizes-3 { grid-template-columns: repeat(3, 1fr); gap: 8px; }
+        .v-cz-sizes-3 .v-cz-size { padding: 12px 8px; text-align: center; align-items: center; }
+        .v-cz-sizes-3 .v-cz-size-label { font-size: 1rem; }
+        .v-cz-sizes-3 .v-cz-size-sub { font-size: 0.68rem; }
         .v-cz-size {
           background: var(--z-white);
           border: 1.5px solid var(--z-border);

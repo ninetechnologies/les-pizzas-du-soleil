@@ -200,7 +200,7 @@ export default function Order() {
         note: address.note,
         slot: selectedSlot ? selectedSlot.label : null,
         items: items.map((it) => ({
-          name: it.name, qty: it.qty || 1, price: it.price,
+          name: it.name, qty: it.qty || 1, price: it.price, size: it.size || null,
           removed: it.removed || [], extras: it.extras || [],
         })),
         total: total + deliveryFee,
@@ -301,7 +301,6 @@ export default function Order() {
                   {[
                     { id: 'place', label: 'Sur place', icon: 'M3 11l9-8 9 8M5 10v10h14V10' },
                     { id: 'emporter', label: 'À emporter', icon: 'M6 2l1 4h10l1-4M5 6h14l-1 15H6L5 6z' },
-                    { id: 'livraison', label: 'Livraison', icon: 'M1 3h15v13H1zM16 8h4l3 3v5h-7V8z' },
                   ].map((m) => (
                     <button key={m.id} className="z-mode-btn" data-on={mode === m.id} onClick={() => setMode(m.id)}>
                       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d={m.icon} /></svg>
@@ -337,6 +336,7 @@ export default function Order() {
                           <img src={it.image} alt="" className="z-cart-thumb" />
                           <div className="z-cart-info">
                             <div className="z-cart-name">{it.name}</div>
+                            {it.size && <div className="z-cart-size">{it.size}</div>}
                             {(it.baseChanged || it.removed?.length > 0 || it.extras?.length > 0) && (
                               <div className="z-cart-mods">
                                 {it.baseChanged && (
@@ -1409,7 +1409,7 @@ export default function Order() {
         }
         .z-mode {
           display: grid;
-          grid-template-columns: repeat(3, 1fr);
+          grid-template-columns: repeat(2, 1fr);
           gap: 8px;
           margin-bottom: 22px;
         }

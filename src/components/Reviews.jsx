@@ -18,13 +18,13 @@ const REVIEWS = [
     name: 'Sophie L.',
     rating: 5,
     date: 'Il y a 3 semaines',
-    text: "La Soleil et la Blanche sont un régal. Les pizzas sont vraiment faites avec soin, on sent l'esprit maison à chaque bouchée.",
+    text: "Le Soleil et la Norvégienne sont un régal. Les pizzas sont vraiment faites avec soin, on sent l'esprit maison à chaque bouchée.",
   },
   {
     name: 'Manon T.',
     rating: 5,
     date: 'Il y a 1 mois',
-    text: "Super découverte ! La livraison est rapide et les pizzas arrivent encore chaudes. L'Orientale avec les merguez est un coup de cœur.",
+    text: "Super découverte ! Commande prête à l'heure et pizzas encore chaudes à emporter. L'Orientale avec les merguez est un coup de cœur.",
   },
   {
     name: 'David M.',

@@ -8,7 +8,7 @@ const BADGES = [
   { icon: '✦', label: 'Fait maison', sub: 'Pâte travaillée maison' },
   { icon: '★', label: 'Artisanale', sub: 'Pizzeria indépendante' },
   { icon: '✓', label: 'Généreuses', sub: 'Garnitures copieuses' },
-  { icon: '⌂', label: 'Saint-Gaudens', sub: 'Livraison incluse' },
+  { icon: '⌂', label: 'Saint-Gaudens', sub: 'Sur place & à emporter' },
 ];
 
 const containerVariants = {
@@ -66,7 +66,7 @@ export default function Hero() {
 
         <motion.p className="z-hero-sub" variants={itemVariants}>
           Pâte travaillée maison, garnitures copieuses, esprit Sud.
-          Commandez en direct : sur place, à emporter ou en livraison.
+          Commandez en direct : sur place ou à emporter.
         </motion.p>
 
         <motion.div className="z-hero-ctas" variants={itemVariants}>

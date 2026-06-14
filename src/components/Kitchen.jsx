@@ -144,6 +144,7 @@ export default function Kitchen({ onLogout }) {
                       <span className="z-tk-qty">{it.qty}x</span>
                       <span>
                         <b>{it.name}</b>
+                        {it.size && <em className="z-tk-sz"> {it.size}</em>}
                         {it.removed?.length > 0 && <em className="z-tk-rm"> sans {it.removed.join(', ').toLowerCase()}</em>}
                         {it.extras?.length > 0 && <em className="z-tk-ex"> {it.extras.map((e) => e.label).join(', ')}</em>}
                       </span>
@@ -245,7 +246,7 @@ export default function Kitchen({ onLogout }) {
             <div className="pds-tk-rule" />
             {ticket.items.map((it, i) => (
               <div className="pds-tk-item" key={i}>
-                <div className="pds-tk-line"><span>{it.qty}x {it.name}</span><span>{fmt(it.price * it.qty)}</span></div>
+                <div className="pds-tk-line"><span>{it.qty}x {it.name}{it.size ? ` (${it.size})` : ''}</span><span>{fmt(it.price * it.qty)}</span></div>
                 {it.removed?.length > 0 && <div className="pds-tk-mod">sans {it.removed.join(', ').toLowerCase()}</div>}
                 {it.extras?.length > 0 && <div className="pds-tk-mod">+ {it.extras.map((e) => e.label).join(', ')}</div>}
               </div>
@@ -301,6 +302,7 @@ export default function Kitchen({ onLogout }) {
         .z-tk-items { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 7px; }
         .z-tk-items li { display: flex; gap: 8px; font-size: .92rem; line-height: 1.35; }
         .z-tk-qty { color: var(--z-gold); font-weight: 800; flex-shrink: 0; }
+        .z-tk-sz { color: var(--z-gold); font-style: normal; font-weight: 700; }
         .z-tk-rm { color: #f78a8a; font-style: normal; }
         .z-tk-ex { color: #8fdca8; font-style: normal; }
         .z-tk-addr { font-size: .8rem; color: rgba(255,255,255,.7); }

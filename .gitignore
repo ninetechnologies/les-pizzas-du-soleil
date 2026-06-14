@@ -3,6 +3,10 @@
 node_modules
 *.log
 
+# secrets / config locale Firebase (ne jamais commit)
+.env
+.env.local
+
 .vercel
 _backup_lowres
 

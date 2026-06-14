@@ -1,0 +1,11 @@
+rules_version = '2';
+// PROJET DEMO (pizzas-du-soleil) — aucune auth, aucune donnee reelle.
+// Acces ouvert volontairement pour la demo cross-device (commande client -> ecran cuisine).
+// En production client : auth obligatoire + regles strictes (cf. CLAUDE.md).
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /{document=**} {
+      allow read, write: if true;
+    }
+  }
+}

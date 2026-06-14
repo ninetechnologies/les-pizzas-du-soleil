@@ -113,6 +113,11 @@ export default function TacosCustomizer({ item, onClose, onConfirm }) {
                   data-active={baseId === b.id}
                   onClick={() => setBaseId(b.id)}
                 >
+                  {baseId === b.id && (
+                    <span className="v-cz-base-check" aria-hidden="true">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3.2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 6L9 17l-5-5" /></svg>
+                    </span>
+                  )}
                   <span className="v-cz-base-swatch" style={{ background: b.color }} aria-hidden="true" />
                   <span className="v-cz-size-label">{b.label}</span>
                   <span className="v-cz-size-sub">{b.sub}</span>
@@ -260,10 +265,17 @@ export default function TacosCustomizer({ item, onClose, onConfirm }) {
           border-color: var(--z-green);
           background: rgba(178,58,30,0.06);
         }
+        .v-cz-base { position: relative; }
         .v-cz-base-swatch {
-          width: 20px; height: 20px; border-radius: 50%;
+          width: 22px; height: 22px; border-radius: 6px;
           border: 1px solid rgba(0,0,0,0.12);
-          box-shadow: inset 0 0 0 2px rgba(255,255,255,0.55);
+          box-shadow: inset 0 0 0 1px rgba(255,255,255,0.4);
+        }
+        .v-cz-base-check {
+          position: absolute; top: 10px; right: 10px;
+          width: 20px; height: 20px; border-radius: 50%;
+          display: grid; place-items: center;
+          background: var(--z-green); color: var(--z-cream);
         }
         .v-cz-size-label {
           font-family: var(--z-font-display);

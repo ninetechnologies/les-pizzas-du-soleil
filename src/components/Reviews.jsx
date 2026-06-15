@@ -6,46 +6,13 @@ const GOOGLE = 'https://www.google.com/search?q=Les+Pizzas+du+Soleil+Saint-Gaude
 // TODO remplacer par le vrai lien pour laisser un avis quand la fiche Google est creee
 const GOOGLE_REVIEW = 'https://www.google.com/maps/search/Les+Pizzas+du+Soleil+Saint-Gaudens';
 
-/* Temoignages placeholder, a remplacer par de vrais avis clients apres ouverture. */
-const REVIEWS = [
-  {
-    name: 'Karim B.',
-    rating: 5,
-    date: 'Il y a 2 semaines',
-    text: "Enfin une vraie pizzeria artisanale à Saint-Gaudens ! La pâte est généreuse, les garnitures copieuses et le service au top. On reviendra sans hésitation.",
-  },
-  {
-    name: 'Sophie L.',
-    rating: 5,
-    date: 'Il y a 3 semaines',
-    text: "Le Soleil et la Norvégienne sont un régal. Les pizzas sont vraiment faites avec soin, on sent l'esprit maison à chaque bouchée.",
-  },
-  {
-    name: 'Manon T.',
-    rating: 5,
-    date: 'Il y a 1 mois',
-    text: "Super découverte ! Commande prête à l'heure et pizzas encore chaudes à emporter. L'Orientale avec les merguez est un coup de cœur.",
-  },
-  {
-    name: 'David M.',
-    rating: 5,
-    date: 'Il y a 1 mois',
-    text: "Pizzas généreuses, pâte bien travaillée, prix corrects. L'esprit maison est vraiment là. Commande en ligne très simple, je recommande.",
-  },
+/* Pas de faux temoignages : on affiche nos engagements (vrais) + un appel a avis Google. */
+const PROMESSES = [
+  { icon: '✦', label: 'Pâte travaillée maison' },
+  { icon: '✓', label: 'Garnitures généreuses' },
+  { icon: '☀', label: 'Esprit maison & créole' },
+  { icon: '◷', label: 'Commande en direct, sans commission' },
 ];
-
-function Stars({ n }) {
-  return (
-    <span className="z-stars" aria-label={`${n} étoiles sur 5`}>
-      {[1, 2, 3, 4, 5].map((i) => (
-        <svg key={i} width="14" height="14" viewBox="0 0 24 24"
-          fill={i <= n ? '#F7A81E' : 'none'} stroke={i <= n ? '#F7A81E' : 'rgba(0,0,0,0.15)'} strokeWidth="1.5">
-          <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
-        </svg>
-      ))}
-    </span>
-  );
-}
 
 export default function Reviews() {
   const [rating, setRating] = useState(0);
@@ -61,32 +28,28 @@ export default function Reviews() {
           transition={{ duration: 0.6 }}
         >
           <h2 className="z-reviews-title">
-            Ce que nos clients <em>en disent</em>.
+            Votre avis nous fait <em>grandir</em>.
           </h2>
+          <p className="z-reviews-intro">
+            Vous avez goûté nos pizzas ? Quelques mots sur Google aident énormément
+            la maison à se faire connaître. Merci d'avance.
+          </p>
         </motion.div>
 
-        <div className="z-reviews-grid">
-          {REVIEWS.map((r, i) => (
-            <motion.figure
-              key={r.name + i}
-              className="z-review"
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: '-80px' }}
-              transition={{ duration: 0.5, delay: i * 0.08, ease: [0.22, 1, 0.36, 1] }}
-            >
-              <div className="z-review-head">
-                <div className="z-review-avatar">{r.name.charAt(0)}</div>
-                <div>
-                  <div className="z-review-name">{r.name}</div>
-                  <div className="z-review-date">{r.date}</div>
-                </div>
-                <Stars n={r.rating} />
-              </div>
-              <blockquote className="z-review-text">"{r.text}"</blockquote>
-            </motion.figure>
+        <motion.div
+          className="z-promesses"
+          initial={{ opacity: 0, y: 24 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: '-80px' }}
+          transition={{ duration: 0.5 }}
+        >
+          {PROMESSES.map((p) => (
+            <div key={p.label} className="z-promesse">
+              <span className="z-promesse-icon">{p.icon}</span>
+              {p.label}
+            </div>
           ))}
-        </div>
+        </motion.div>
 
         <motion.div
           className="z-revform"
@@ -122,33 +85,28 @@ export default function Reviews() {
 
       <style>{`
         .z-reviews { padding: 100px 0; background: var(--z-cream); }
-        .z-reviews-head { text-align: center; max-width: 760px; margin: 0 auto 56px; }
-
+        .z-reviews-head { text-align: center; max-width: 760px; margin: 0 auto 36px; }
         .z-reviews-title {
           font-family: var(--z-font-display); font-size: clamp(2rem, 5vw, 3.4rem);
           font-weight: 900; line-height: 1.05; letter-spacing: -0.025em; color: var(--z-black); margin: 0;
         }
         .z-reviews-title em { font-style: italic; color: var(--z-red); }
+        .z-reviews-intro { font-size: 1.05rem; color: var(--z-text-muted); line-height: 1.6; margin: 16px 0 0; }
 
-        .z-reviews-grid { display: grid; grid-template-columns: 1fr; gap: 18px; margin-bottom: 40px; }
-        @media (min-width: 720px) { .z-reviews-grid { grid-template-columns: repeat(2, 1fr); } }
-        @media (min-width: 1024px) { .z-reviews-grid { grid-template-columns: repeat(4, 1fr); } }
-
-        .z-review {
-          background: var(--z-white); border-radius: 18px; padding: 26px 24px;
-          box-shadow: 0 1px 3px rgba(42, 23, 18, 0.06); margin: 0;
-          display: flex; flex-direction: column; gap: 16px;
+        .z-promesses {
+          display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
+          max-width: 720px; margin: 0 auto 40px;
         }
-        .z-review-head { display: grid; grid-template-columns: 44px 1fr auto; gap: 12px; align-items: center; }
-        .z-review-avatar {
-          width: 44px; height: 44px; border-radius: 50%;
-          background: linear-gradient(135deg, var(--z-red) 0%, var(--z-red-dark) 100%);
-          color: var(--z-white); display: grid; place-items: center;
-          font-family: var(--z-font-display); font-weight: 800; font-size: 1.15rem;
+        @media (min-width: 760px) { .z-promesses { grid-template-columns: repeat(4, 1fr); } }
+        .z-promesse {
+          display: flex; flex-direction: column; align-items: center; gap: 8px; text-align: center;
+          background: var(--z-white); border-radius: 16px; padding: 20px 14px;
+          box-shadow: 0 1px 3px rgba(42, 23, 18, 0.06); font-weight: 600; font-size: 0.9rem; color: var(--z-black);
         }
-        .z-review-name { font-weight: 600; color: var(--z-black); line-height: 1.2; }
-        .z-review-date { font-size: 0.72rem; color: var(--z-text-muted); margin-top: 2px; }
-        .z-review-text { margin: 0; font-size: 0.92rem; line-height: 1.55; color: var(--z-text); font-style: italic; }
+        .z-promesse-icon {
+          width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center;
+          background: var(--z-gold); color: var(--z-black); font-size: 1.1rem;
+        }
 
         .z-reviews-cta {
           display: block; text-align: center; font-weight: 600; color: var(--z-green);
@@ -156,7 +114,6 @@ export default function Reviews() {
           text-underline-offset: 4px; font-size: 0.95rem; transition: color 0.2s;
         }
         .z-reviews-cta:hover { color: var(--z-red); }
-        .z-stars { display: inline-flex; gap: 1px; line-height: 0; }
 
         .z-revform {
           max-width: 560px; margin: 8px auto 0; text-align: center;

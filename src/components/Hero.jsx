@@ -8,6 +8,7 @@ const BADGES = [
   { icon: '✦', label: 'Fait maison', sub: 'Pâte travaillée maison' },
   { icon: '★', label: 'Artisanale', sub: 'Pizzeria indépendante' },
   { icon: '✓', label: 'Généreuses', sub: 'Garnitures copieuses' },
+  { icon: '☪', label: 'Viande halal', sub: 'Toutes nos viandes' },
   { icon: '⌂', label: 'Saint-Gaudens', sub: 'Sur place & à emporter' },
 ];
 

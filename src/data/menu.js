@@ -60,7 +60,7 @@ export const FEATURED = [
     desc: "Tomate, emmental, chèvre, miel, olive.",
     price: 8.5,
     sizes: sz(8.5, 13, 15),
-    image: pi('chevre-miel.jpg'),
+    image: pi('chevre-miel-reelle.jpg'),
   },
   {
     id: '4-fromages',
@@ -80,7 +80,7 @@ export const CARTE = [
       { name: 'Roma', desc: "Tomate, emmental, jambon, merguez, œuf, olive.", price: 7.5, sizes: sz(7.5, 13, 16), img: pi('jambon-oeuf.jpg') },
       { name: 'Hawaïenne', desc: "Tomate, emmental, poulet, ananas, olive.", price: 7, sizes: sz(7, 13, 16) },
       { name: 'Pépéronna', desc: "Tomate, mozzarella, chorizo, olive.", price: 7, sizes: sz(7, 13, 16) },
-      { name: 'Campagnarde', desc: "Tomate, emmental, lardon, chèvre, olive.", price: 6.5, sizes: sz(6.5, 12.5, 15), img: pi('chevre-lardons.jpg') },
+      { name: 'Campagnarde', desc: "Tomate, emmental, lardon, chèvre, olive.", price: 6.5, sizes: sz(6.5, 12.5, 15) },
       { name: 'Alsacienne', desc: "Crème fraîche, emmental, pomme de terre, oignons, lardons, olive.", price: 6.5, sizes: sz(6.5, 12.5, 15), img: pi('carbonara.jpg') },
       { name: 'Casa Blanca', desc: "Crème fraîche, champignons, lardons, chèvre, miel, mozzarella.", price: 7, sizes: sz(7, 13, 16) },
       { name: 'Orientale', desc: "Tomate, emmental, poivron, merguez, olive.", price: 6.5, sizes: sz(6.5, 12.5, 15), img: pi('merguez-poivrons.jpg') },
@@ -98,7 +98,7 @@ export const CARTE = [
     cat: 'Pizzas Fromages & Légumes',
     items: [
       { name: 'Margherita', desc: "Tomate, emmental, olive.", price: 7, sizes: sz(7, 10, 13), img: pi('fromage-olives.jpg') },
-      { name: 'Chèvre-Miel', desc: "Tomate, emmental, chèvre, miel, olive.", price: 8.5, sizes: sz(8.5, 13, 15), img: pi('chevre-miel.jpg') },
+      { name: 'Chèvre-Miel', desc: "Tomate, emmental, chèvre, miel, olive.", price: 8.5, sizes: sz(8.5, 13, 15), img: pi('chevre-miel-reelle.jpg') },
       { name: '4 Fromages', desc: "Tomate, emmental, roquefort, chèvre, raclette, oignon, crème fraîche.", price: 8.5, sizes: sz(8.5, 13, 15), img: pi('4-fromages.jpg') },
       { name: 'Végétarienne', desc: "Tomate, emmental, champignons, poivrons verts, oignon, œuf, persillade.", price: 7, sizes: sz(7, 13, 15) },
       { name: 'La Fermière', desc: "Tomate, mozzarella, champignons, œuf, persillade, olive.", price: 8, sizes: sz(8, 13.5, 15) },

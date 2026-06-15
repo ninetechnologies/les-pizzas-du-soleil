@@ -117,7 +117,13 @@ export default function Kitchen({ onLogout }) {
     return () => clearInterval(id);
   }, []);
 
-  const enableSound = () => { const ok = primeAudio(); beep(); setSoundOn(ok || audioReady()); };
+  const enableSound = () => {
+    // Geste utilisateur : on debloque l'audio et on joue un bip de confirmation.
+    // On considere le son actif des le tap (le bip est la confirmation a l'oreille).
+    primeAudio();
+    beep();
+    setSoundOn(true);
+  };
 
   const doPrint = (order) => {
     setTicket(order);
@@ -134,7 +140,12 @@ export default function Kitchen({ onLogout }) {
     .filter((o) => !isSoon(o))
     .sort((a, b) => (a.slotTime || 0) - (b.slotTime || 0));
 
-  const renderCard = (o) => (
+  const renderCard = (o) => {
+    const soon = isSoon(o);
+    // PDS : une commande programmee ne peut pas etre demarree avant l'approche de
+    // son creneau (eviter de la cuisiner un jour trop tot). Refus/annulation restent possibles.
+    const locked = o.status === 'recue' && !soon;
+    return (
     <div key={o.code} className="z-tk" data-status={o.status}>
       <div className={`z-tk-when${o.asap ? ' z-tk-when-asap' : ''}`}>
         {o.asap
@@ -173,10 +184,17 @@ export default function Kitchen({ onLogout }) {
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M6 9V2h12v7M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><path d="M6 14h12v8H6z"/></svg>
           Ticket
         </button>
-        <button className={`z-tk-act ${ACTION[o.status].cls}`} onClick={() => updateStatus(o.code, nextStatus(o.status))}>
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round"><path d={ACTION[o.status].icon}/></svg>
-          {ACTION[o.status].label}
-        </button>
+        {locked ? (
+          <button className="z-tk-act go-wait" disabled title="Démarrage possible à l'approche du créneau">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            Programmée
+          </button>
+        ) : (
+          <button className={`z-tk-act ${ACTION[o.status].cls}`} onClick={() => updateStatus(o.code, nextStatus(o.status))}>
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round"><path d={ACTION[o.status].icon}/></svg>
+            {ACTION[o.status].label}
+          </button>
+        )}
       </div>
       {o.status === 'recue' && (
         <div className="z-tk-cta2">
@@ -191,7 +209,8 @@ export default function Kitchen({ onLogout }) {
         </div>
       )}
     </div>
-  );
+    );
+  };
 
   return (
     <>
@@ -407,6 +426,7 @@ export default function Kitchen({ onLogout }) {
         .z-tk-act.go-ready:hover { background: #1cb854; }
         .z-tk-act.go-done { background: #3a332d; border: 1.5px solid rgba(255,255,255,.18); }
         .z-tk-act.go-done:hover { background: #4a423a; }
+        .z-tk-act.go-wait { background: rgba(255,255,255,.06); color: rgba(255,255,255,.5); border: 1.5px dashed rgba(255,255,255,.2); cursor: not-allowed; box-shadow: none; }
         @keyframes zready {
           0% { box-shadow: 0 8px 22px -8px rgba(0,0,0,.6), 0 0 0 0 rgba(22,163,74,.55); }
           70% { box-shadow: 0 8px 22px -8px rgba(0,0,0,.6), 0 0 0 14px rgba(22,163,74,0); }

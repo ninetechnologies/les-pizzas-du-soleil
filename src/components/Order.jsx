@@ -292,7 +292,9 @@ export default function Order() {
         )}
 
         <div className="z-order-box" ref={boxRef}>
-          <AnimatePresence mode="wait">
+          {/* Transitions par etape : chaque etape s'anime a l'entree (key unique).
+              Pas d'AnimatePresence mode="wait" ici : son orchestration de sortie
+              peut bloquer le tunnel si l'onglet passe en arriere-plan (rAF throttle). */}
             {/* === ÉTAPE 1 : PANIER === */}
             {step === 'cart' && (
               <motion.div
@@ -751,31 +753,41 @@ export default function Order() {
                 </div>
 
                 {/* Suivi temps réel du statut (mis à jour par la cuisine) */}
-                <div className="z-track">
-                  <div className="z-track-head">Suivi de votre commande</div>
-                  <div className="z-track-steps">
-                    {[
-                      { id: 'recue', label: 'Reçue' },
-                      { id: 'preparation', label: 'En préparation' },
-                      { id: 'prete', label: 'Prête' },
-                    ].map((s, i) => {
-                      const order = ['recue', 'preparation', 'prete'];
-                      const cur = order.indexOf(liveStatus === 'terminee' ? 'prete' : liveStatus);
-                      return (
-                        <div key={s.id} className="z-track-step" data-on={i <= cur} data-active={i === cur}>
-                          <span className="z-track-dot" />
-                          <span className="z-track-label">{s.label}</span>
-                        </div>
-                      );
-                    })}
+                {liveStatus === 'refusee' || liveStatus === 'annulee' ? (
+                  <div className="z-track-refused">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="9"/><path d="M15 9l-6 6M9 9l6 6"/></svg>
+                    <div>
+                      <strong>{liveStatus === 'refusee' ? 'Commande refusée par le restaurant' : 'Commande annulée'}</strong>
+                      <span>Aucun montant n'est dû. Pour toute question, appelez le restaurant.</span>
+                    </div>
                   </div>
-                  {(liveStatus === 'prete' || liveStatus === 'terminee') && (
-                    <motion.div className="z-track-ready" initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}>
-                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9M13.7 21a2 2 0 0 1-3.4 0"/></svg>
-                      {isDelivery ? 'Votre commande est prête, on arrive !' : 'Votre commande est prête, à récupérer !'}
-                    </motion.div>
-                  )}
-                </div>
+                ) : (
+                  <div className="z-track">
+                    <div className="z-track-head">Suivi de votre commande</div>
+                    <div className="z-track-steps">
+                      {[
+                        { id: 'recue', label: 'Reçue' },
+                        { id: 'preparation', label: 'En préparation' },
+                        { id: 'prete', label: 'Prête' },
+                      ].map((s, i) => {
+                        const order = ['recue', 'preparation', 'prete'];
+                        const cur = order.indexOf(liveStatus === 'terminee' ? 'prete' : liveStatus);
+                        return (
+                          <div key={s.id} className="z-track-step" data-on={i <= cur} data-active={i === cur}>
+                            <span className="z-track-dot" />
+                            <span className="z-track-label">{s.label}</span>
+                          </div>
+                        );
+                      })}
+                    </div>
+                    {(liveStatus === 'prete' || liveStatus === 'terminee') && (
+                      <motion.div className="z-track-ready" initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}>
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9M13.7 21a2 2 0 0 1-3.4 0"/></svg>
+                        {mode === 'emporter' ? 'Votre commande est prête, à récupérer !' : 'Votre commande est prête !'}
+                      </motion.div>
+                    )}
+                  </div>
+                )}
 
                 {loyalty && (
                   <motion.div className="z-loyalty" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}>
@@ -811,7 +823,6 @@ export default function Order() {
                 </div>
               </motion.div>
             )}
-          </AnimatePresence>
         </div>
       </div>
 
@@ -1451,6 +1462,15 @@ export default function Order() {
           margin-top: 18px; padding: 14px; border-radius: 12px;
           background: var(--z-success); color: #fff; font-weight: 700; font-size: 1rem;
         }
+        .z-track-refused {
+          width: 100%; max-width: 420px; margin: 8px auto 22px;
+          display: flex; align-items: flex-start; gap: 12px; text-align: left;
+          background: rgba(220,38,38,.08); border: 1px solid rgba(220,38,38,.3);
+          border-radius: 16px; padding: 18px 20px; color: var(--z-danger);
+        }
+        .z-track-refused svg { flex-shrink: 0; margin-top: 1px; }
+        .z-track-refused strong { display: block; color: var(--z-text); font-size: 1rem; margin-bottom: 3px; }
+        .z-track-refused span { font-size: .86rem; color: var(--z-text-muted); line-height: 1.45; }
 
         .z-loyalty {
           width: 100%; max-width: 420px; margin: 0 auto 20px;

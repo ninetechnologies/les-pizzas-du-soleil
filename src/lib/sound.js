@@ -37,7 +37,7 @@ export function beep() {
   const c = ensureCtx();
   if (!c) return;
   try {
-    const t = c.currentTime;
+    const t = c.currentTime + 0.06; // petite avance : joue meme si resume() vient d'avoir lieu
     const o = c.createOscillator();
     const g = c.createGain();
     o.connect(g); g.connect(c.destination);
@@ -54,7 +54,7 @@ export function playAlarm() {
   const c = ensureCtx();
   if (!c) return;
   try {
-    const now = c.currentTime;
+    const now = c.currentTime + 0.06; // joue meme si resume() vient d'avoir lieu
     for (let i = 0; i < 5; i++) {
       [988, 1319].forEach((f, j) => {
         const t = now + i * 0.5 + j * 0.15;

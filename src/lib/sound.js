@@ -63,8 +63,8 @@ export function playAlarm() {
         o.connect(g); g.connect(c.destination);
         o.type = 'square'; o.frequency.value = f;
         g.gain.setValueAtTime(0.0001, t);
-        g.gain.exponentialRampToValueAtTime(0.34, t + 0.012);
-        g.gain.exponentialRampToValueAtTime(0.0001, t + 0.14);
+        g.gain.exponentialRampToValueAtTime(0.6, t + 0.012);
+        g.gain.exponentialRampToValueAtTime(0.0001, t + 0.16);
         o.start(t); o.stop(t + 0.15);
       });
     }

@@ -237,8 +237,8 @@ export const LOCATIONS = [
     address: "7 avenue Francois Mitterrand",
     zip: '31800 Saint-Gaudens',
     // TODO confirmer tel pizzeria avec Marie
-    tel: '05 61 94 33 29',
-    telHref: '+33561943329',
+    tel: '07 46 05 30 87',
+    telHref: '+33746053087',
     rating: null,
     reviews: '',
     image: ai('galerie-2.jpg'),

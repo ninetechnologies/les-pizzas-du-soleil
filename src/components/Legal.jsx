@@ -6,9 +6,8 @@ export function openLegal(doc) {
   window.dispatchEvent(new CustomEvent('pds:open-legal', { detail: doc }));
 }
 
-/* TODO Marie : remplacer le telephone placeholder + ajouter un email de contact
-   de l'etablissement quand ils seront confirmes. */
-const TEL = '05 61 94 33 29';
+/* TODO Marie : ajouter un email de contact de l'etablissement (RGPD) si dispo. */
+const TEL = '07 46 05 30 87'; // confirme par Marie le 15/06
 
 function Mentions() {
   return (

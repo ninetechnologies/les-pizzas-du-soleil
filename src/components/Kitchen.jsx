@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { getOrders, subscribe, updateStatus, clearOrders } from '../lib/orders.js';
+import { primeAudio, playAlarm } from '../lib/sound.js';
 
 const fmt = (n) => n.toFixed(2).replace('.', ',') + ' €';
 const STATUS = [
@@ -24,30 +25,8 @@ const timeStr = (ts) => {
   return `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
 };
 
-/* Alarme cuisine : forte et repetee (bip-bip aigu sur ~2,5 s) — pensee pour les
-   coups de feu et quand le cuisinier n'est pas a cote de la tablette. */
-let _actx = null;
-function alarm() {
-  try {
-    _actx = _actx || new (window.AudioContext || window.webkitAudioContext)();
-    const ctx = _actx;
-    if (ctx.state === 'suspended') ctx.resume();
-    const now = ctx.currentTime;
-    for (let c = 0; c < 5; c++) {
-      [988, 1319].forEach((f, j) => {
-        const t = now + c * 0.5 + j * 0.15;
-        const o = ctx.createOscillator();
-        const g = ctx.createGain();
-        o.connect(g); g.connect(ctx.destination);
-        o.type = 'square'; o.frequency.value = f;
-        g.gain.setValueAtTime(0.0001, t);
-        g.gain.exponentialRampToValueAtTime(0.34, t + 0.012);
-        g.gain.exponentialRampToValueAtTime(0.0001, t + 0.14);
-        o.start(t); o.stop(t + 0.15);
-      });
-    }
-  } catch (e) {}
-}
+// Alarme cuisine deportee dans lib/sound.js (alias local pour limiter le diff).
+const alarm = playAlarm;
 
 export default function Kitchen({ onLogout }) {
   const [orders, setOrders] = useState([]);
@@ -72,6 +51,34 @@ export default function Kitchen({ onLogout }) {
     });
     return unsub;
   }, [printer.connected, printer.auto]);
+
+  // Mobile : garder l'ecran allume (Wake Lock), debloquer le son au 1er geste
+  // (utile si connexion auto sans clic), et re-amorcer au retour a l'ecran.
+  useEffect(() => {
+    let wakeLock = null;
+    const requestWake = async () => {
+      try {
+        if ('wakeLock' in navigator && document.visibilityState === 'visible') {
+          wakeLock = await navigator.wakeLock.request('screen');
+        }
+      } catch (e) {}
+    };
+    requestWake();
+
+    const onGesture = () => primeAudio();
+    window.addEventListener('pointerdown', onGesture, { once: true });
+
+    const onVisible = () => {
+      if (document.visibilityState === 'visible') { primeAudio(); requestWake(); }
+    };
+    document.addEventListener('visibilitychange', onVisible);
+
+    return () => {
+      window.removeEventListener('pointerdown', onGesture);
+      document.removeEventListener('visibilitychange', onVisible);
+      try { wakeLock && wakeLock.release(); } catch (e) {}
+    };
+  }, []);
 
   // Relance l'alarme toutes les 20 s tant qu'une commande n'a pas ete demarree
   useEffect(() => {

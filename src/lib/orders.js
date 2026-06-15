@@ -11,7 +11,7 @@
 
 import { initializeApp } from 'firebase/app';
 import {
-  getFirestore,
+  initializeFirestore,
   collection,
   doc,
   setDoc,
@@ -41,7 +41,13 @@ export const CLOUD = Boolean(firebaseConfig);
 const COLL = 'pds_orders';
 
 let db = null;
-if (CLOUD) db = getFirestore(initializeApp(firebaseConfig));
+if (CLOUD) {
+  // autoDetectLongPolling : streaming temps reel fiable sur reseaux mobiles / proxies
+  // (sinon les mises a jour n'arrivent qu'au rechargement de page).
+  db = initializeFirestore(initializeApp(firebaseConfig), {
+    experimentalAutoDetectLongPolling: true,
+  });
+}
 
 // ---------------------------------------------------------------------------
 // Cache + diffusion (commun aux deux modes)

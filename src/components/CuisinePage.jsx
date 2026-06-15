@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { motion } from 'motion/react';
 import Kitchen from './Kitchen.jsx';
 import Logo from './Logo.jsx';
+import { primeAudio } from '../lib/sound.js';
 
 /* Identifiants demo (en prod : comptes Firebase Auth par restaurant). */
 const CREDS = { id: 'soleil', mdp: 'cuisine31' };
@@ -22,6 +23,7 @@ export default function CuisinePage() {
   const submit = (e) => {
     e.preventDefault();
     if (id.trim().toLowerCase() === CREDS.id && mdp === CREDS.mdp) {
+      primeAudio(); // debloque le son dans le geste de connexion (mobile)
       (remember ? localStorage : sessionStorage).setItem(KEY, '1');
       setErr('');
       setAuthed(true);

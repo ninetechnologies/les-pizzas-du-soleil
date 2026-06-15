@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { useCart } from '../hooks/useCart.jsx';
 import { placeOrder, subscribe, getOrders } from '../lib/orders.js';
-import { addStamp, GOAL } from '../lib/loyalty.js';
+import { addStamp, getCard, GOAL } from '../lib/loyalty.js';
 
 function chime() {
   try {
@@ -123,7 +123,8 @@ export default function Order() {
   const [mode, setMode] = useState('place'); // 'place' | 'emporter'
   const payment = 'place'; // paiement sur place uniquement (pas de paiement en ligne)
   const [liveStatus, setLiveStatus] = useState('recue'); // suivi temps réel côté client
-  const [loyalty, setLoyalty] = useState(null); // carte de fidélité (résultat après commande)
+  const [loyalty, setLoyalty] = useState(null); // carte de fidélité (aperçu puis crédit à la récupération)
+  const stamped = useRef(false); // évite de créditer le tampon deux fois
   const slots = generateSlots();
   const deliveryFee = mode === 'livraison' ? 2.5 : 0;
   const isDelivery = mode === 'livraison';
@@ -179,6 +180,11 @@ export default function Order() {
       const o = list.find((x) => x.code === orderCode);
       if (!o) return;
       setLiveStatus(o.status);
+      // Tampon de fidelite credite seulement quand la commande est honoree.
+      if ((o.status === 'prete' || o.status === 'terminee') && !stamped.current) {
+        stamped.current = true;
+        setLoyalty(addStamp(o.phone || address.phone));
+      }
       if (o.status === 'prete' && prev !== 'prete') {
         chime();
         try {
@@ -222,7 +228,11 @@ export default function Order() {
       total: total + deliveryFee,
       createdAt: Date.now(),
     });
-    setLoyalty(addStamp(address.phone));
+    // Apercu de la carte de fidelite SANS ajouter de tampon : le tampon n'est
+    // credite qu'a la recuperation (statut "prete"), pas a la commande, pour ne
+    // pas recompenser une commande qui serait refusee ou annulee.
+    stamped.current = false;
+    setLoyalty({ ...getCard(address.phone), pending: true });
     setOrderCode(code);
     setStep('success');
   };
@@ -235,6 +245,7 @@ export default function Order() {
     setSelectedSlot(null);
     setOrderCode(null);
     setLoyalty(null);
+    stamped.current = false;
   };
 
   return (
@@ -789,15 +800,17 @@ export default function Order() {
                   </div>
                 )}
 
-                {loyalty && (
+                {loyalty && liveStatus !== 'refusee' && liveStatus !== 'annulee' && (
                   <motion.div className="z-loyalty" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}>
                     <div className="z-loyalty-head">
                       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 12v10H4V12M2 7h20v5H2zM12 22V7M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7zM12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg>
                       Carte de fidélité
                     </div>
-                    {loyalty.reward
-                      ? <div className="z-loyalty-reward">Bravo ! Vous débloquez <strong>une pizza offerte</strong> sur votre prochaine visite.</div>
-                      : <div className="z-loyalty-prog">Plus que <strong>{GOAL - loyalty.stamps}</strong> commande{GOAL - loyalty.stamps > 1 ? 's' : ''} avant une <strong>pizza offerte</strong>.</div>}
+                    {loyalty.pending
+                      ? <div className="z-loyalty-prog">Votre tampon sera ajouté <strong>à la récupération</strong> de la commande.</div>
+                      : loyalty.reward
+                        ? <div className="z-loyalty-reward">Bravo ! Vous débloquez <strong>une pizza offerte</strong> sur votre prochaine visite.</div>
+                        : <div className="z-loyalty-prog">Plus que <strong>{GOAL - loyalty.stamps}</strong> commande{GOAL - loyalty.stamps > 1 ? 's' : ''} avant une <strong>pizza offerte</strong>.</div>}
                     <div className="z-loyalty-dots">
                       {Array.from({ length: GOAL }).map((_, i) => (
                         <span key={i} className="z-loyalty-dot" data-on={i < (loyalty.reward ? GOAL : loyalty.stamps)} />

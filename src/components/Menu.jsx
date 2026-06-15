@@ -28,7 +28,21 @@ const priceLabel = (it) => (it.sizes && it.sizes.length ? 'dès ' + fmt(it.price
 export default function Menu() {
   const [justAdded, setJustAdded] = useState(null);
   const [customizing, setCustomizing] = useState(null);
+  const [choosingPlaque, setChoosingPlaque] = useState(null); // plaque dont on choisit le type de pizza
   const { addItem } = useCart();
+
+  // Pizzas disponibles pour la plaque en cours de choix (selon sa categorie)
+  const plaquePizzas = choosingPlaque
+    ? (CARTE.find((c) => c.cat === choosingPlaque.plaqueOf)?.items || [])
+    : [];
+
+  const addPlaque = (plaque, pizza) => {
+    const id = slug(`${plaque.name}-${pizza.name}`);
+    addItem({ id, name: `${plaque.name} — ${pizza.name}`, price: plaque.price, image: pizza.img || plaque.img || '/logo.png' });
+    setJustAdded(id);
+    setChoosingPlaque(null);
+    setTimeout(() => setJustAdded(null), 1100);
+  };
 
   const add = (item, image) => {
     addItem({ id: item.id || slug(item.name), name: item.name, price: item.price, image: image || '/logo.png' });
@@ -168,9 +182,9 @@ export default function Menu() {
                       </div>
                       <button
                         className="z-carte-add"
-                        onClick={() => customConfig(it) ? openCustomizer(it, it.img) : add(item, it.img)}
+                        onClick={() => it.plaqueOf ? setChoosingPlaque(it) : customConfig(it) ? openCustomizer(it, it.img) : add(item, it.img)}
                         data-success={justAdded === id}
-                        aria-label={`${customConfig(it) ? 'Personnaliser' : 'Ajouter'} ${it.name}`}
+                        aria-label={`${it.plaqueOf ? 'Choisir la pizza pour' : customConfig(it) ? 'Personnaliser' : 'Ajouter'} ${it.name}`}
                       >
                         <span className="z-carte-price">{priceLabel(it)}</span>
                         {justAdded === id ? (
@@ -200,6 +214,54 @@ export default function Menu() {
             onClose={() => setCustomizing(null)}
             onConfirm={onCustomConfirm}
           />
+        )}
+      </AnimatePresence>
+
+      {/* Choix du type de pizza pour une plaque (viandes / fromage / poisson) */}
+      <AnimatePresence>
+        {choosingPlaque && (
+          <motion.div
+            className="z-plaque-overlay"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setChoosingPlaque(null)}
+          >
+            <motion.div
+              className="z-plaque-modal"
+              data-lenis-prevent
+              initial={{ y: 40, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              exit={{ y: 20, opacity: 0 }}
+              transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="z-plaque-head">
+                <div>
+                  <h3>{choosingPlaque.name}</h3>
+                  <p>Choisissez votre pizza · {fmt(choosingPlaque.price)} la plaque (40 x 60 cm)</p>
+                </div>
+                <button className="z-plaque-close" onClick={() => setChoosingPlaque(null)} aria-label="Fermer">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round"><path d="M18 6L6 18M6 6l12 12" /></svg>
+                </button>
+              </div>
+              <ul className="z-plaque-list">
+                {plaquePizzas.map((p) => (
+                  <li key={p.name}>
+                    <button onClick={() => addPlaque(choosingPlaque, p)}>
+                      {p.img && <img src={p.img} alt={p.name} loading="lazy" />}
+                      <span className="z-plaque-pz">
+                        <span className="z-plaque-pz-name">{p.name}</span>
+                        {p.desc && <span className="z-plaque-pz-desc">{p.desc}</span>}
+                      </span>
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M12 5v14M5 12h14" /></svg>
+                    </button>
+                  </li>
+                ))}
+              </ul>
+              <p className="z-plaque-note">Prix unique {fmt(choosingPlaque.price)}, quelle que soit la pizza choisie.</p>
+            </motion.div>
+          </motion.div>
         )}
       </AnimatePresence>
 
@@ -280,6 +342,38 @@ export default function Menu() {
         .z-carte-price { font-family: var(--z-font-display); font-weight: 700; font-size: 0.95rem; white-space: nowrap; }
 
         .z-menu-note { margin-top: 40px; text-align: center; font-size: 0.84rem; color: var(--z-text-muted); font-style: italic; }
+
+        /* Choix de pizza pour une plaque */
+        .z-plaque-overlay {
+          position: fixed; inset: 0; z-index: 500;
+          background: rgba(22, 17, 14, 0.62); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+          display: flex; align-items: flex-end; justify-content: center;
+        }
+        @media (min-width: 760px) { .z-plaque-overlay { align-items: center; padding: 24px; } }
+        .z-plaque-modal {
+          width: 100%; max-width: 540px; max-height: 92vh; overflow-y: auto;
+          background: var(--z-cream); border-radius: 22px 22px 0 0; padding: 22px;
+          box-shadow: 0 -20px 60px rgba(0,0,0,0.35);
+        }
+        @media (min-width: 760px) { .z-plaque-modal { border-radius: 22px; padding: 26px; } }
+        .z-plaque-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 14px; margin-bottom: 16px; }
+        .z-plaque-head h3 { font-family: var(--z-font-display); font-weight: 700; font-size: 1.4rem; color: var(--z-black); margin: 0 0 4px; }
+        .z-plaque-head p { font-size: 0.84rem; color: var(--z-text-muted); margin: 0; }
+        .z-plaque-close { width: 36px; height: 36px; border-radius: 50%; background: rgba(0,0,0,0.06); color: var(--z-text); display: grid; place-items: center; flex-shrink: 0; cursor: pointer; }
+        .z-plaque-close:hover { background: rgba(0,0,0,0.12); }
+        .z-plaque-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 8px; }
+        .z-plaque-list button {
+          width: 100%; display: flex; align-items: center; gap: 12px; padding: 10px 12px;
+          background: var(--z-white); border: 1.5px solid var(--z-border); border-radius: 14px;
+          text-align: left; color: var(--z-text); cursor: pointer; transition: border-color 0.2s, background 0.2s;
+        }
+        .z-plaque-list button:hover { border-color: var(--z-red); background: var(--z-cream-warm); }
+        .z-plaque-list img { width: 48px; height: 48px; border-radius: 10px; object-fit: cover; flex: none; background: var(--z-cream-warm); }
+        .z-plaque-pz { display: flex; flex-direction: column; gap: 2px; flex: 1; min-width: 0; }
+        .z-plaque-pz-name { font-weight: 600; color: var(--z-black); font-size: 0.96rem; }
+        .z-plaque-pz-desc { font-size: 0.76rem; color: var(--z-text-muted); line-height: 1.35; }
+        .z-plaque-list button > svg { color: var(--z-red); flex: none; }
+        .z-plaque-note { font-size: 0.76rem; color: var(--z-text-muted); font-style: italic; text-align: center; margin: 16px 0 0; }
       `}</style>
     </section>
   );

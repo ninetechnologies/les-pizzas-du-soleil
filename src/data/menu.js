@@ -119,10 +119,12 @@ export const CARTE = [
   {
     cat: 'Plaques pizzas (40 x 60 cm)',
     items: [
-      { name: 'Plaque classique', desc: "Grande plaque 40 x 60 cm, garnitures classiques.", price: 26.5 },
-      { name: 'Plaque viandes', desc: "Grande plaque 40 x 60 cm, garnitures viandes.", price: 28.5 },
-      { name: 'Plaque fromage', desc: "Grande plaque 40 x 60 cm, garnitures fromages.", price: 31 },
-      { name: 'Plaque poisson', desc: "Grande plaque 40 x 60 cm, garnitures poisson.", price: 32.5 },
+      // Classique : recette fixe (type Margherita), pas de choix.
+      { name: 'Plaque classique', desc: "Grande plaque 40 x 60 cm, tomate et fromage (type Margherita).", price: 26.5 },
+      // Les 3 suivantes : le client choisit le type de pizza dans la categorie correspondante.
+      { name: 'Plaque viandes', desc: "Grande plaque 40 x 60 cm, pizza viande au choix.", price: 28.5, plaqueOf: 'Pizzas Viandes' },
+      { name: 'Plaque fromage', desc: "Grande plaque 40 x 60 cm, pizza fromage & légumes au choix.", price: 31, plaqueOf: 'Pizzas Fromages & Légumes' },
+      { name: 'Plaque poisson', desc: "Grande plaque 40 x 60 cm, pizza poisson au choix.", price: 32.5, plaqueOf: 'Pizzas Poissons' },
     ],
   },
   {

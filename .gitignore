@@ -25,3 +25,7 @@ dist/
 gen_carte.py
 carte.html
 *.pdf
+
+# Acces / credentials cuisine (local, jamais commit)
+*.local.txt
+A-APPLIQUER-*.md

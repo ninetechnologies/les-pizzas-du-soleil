@@ -70,8 +70,6 @@ export default function CuisinePage() {
         {err && <div className="z-login-err">{err}</div>}
 
         <button type="submit" className="z-btn z-btn-primary z-login-btn" disabled={busy}>{busy ? 'Connexion…' : 'Se connecter'}</button>
-
-        <p className="z-login-hint">Démo · identifiant&nbsp;: <b>soleil</b> · mot de passe&nbsp;: <b>cuisine31</b></p>
       </motion.form>
 
       <style>{`
@@ -101,8 +99,6 @@ export default function CuisinePage() {
         .z-login-remember span { font-size: .88rem; color: var(--z-text); }
         .z-login-err { width: 100%; background: rgba(220,38,38,.1); color: var(--z-danger); font-size: .85rem; font-weight: 600; padding: 10px 14px; border-radius: 10px; margin-bottom: 14px; }
         .z-login-btn { width: 100%; }
-        .z-login-hint { font-size: .76rem; color: var(--z-text-muted); margin-top: 18px; }
-        .z-login-hint b { color: var(--z-text); }
       `}</style>
     </div>
   );

@@ -118,10 +118,11 @@ export default function Kitchen({ onLogout }) {
   }, []);
 
   const enableSound = () => {
-    // Geste utilisateur : on debloque l'audio et on joue un bip de confirmation.
-    // On considere le son actif des le tap (le bip est la confirmation a l'oreille).
+    // Geste utilisateur : on debloque l'audio et on joue l'ALARME reelle (et pas un
+    // simple bip) pour que le commercant entende exactement le son d'une nouvelle
+    // commande — testable a la demande, meme hors heures d'ouverture.
     primeAudio();
-    beep();
+    playAlarm();
     setSoundOn(true);
   };
 
@@ -223,13 +224,13 @@ export default function Kitchen({ onLogout }) {
             <em>{active.length} en cours</em>
           </div>
           <div className="z-kds-actions">
-            <button className="z-kds-sound" data-on={soundOn} onClick={enableSound} aria-label="Activer le son des nouvelles commandes">
+            <button className="z-kds-sound" data-on={soundOn} onClick={enableSound} title="Joue l'alarme pour tester le son (à faire une fois sur la tablette)" aria-label="Activer et tester le son des nouvelles commandes">
               {soundOn ? (
                 <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M15.5 8.5a5 5 0 0 1 0 7M19 5a9 9 0 0 1 0 14"/></svg>
               ) : (
                 <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M22 9l-6 6M16 9l6 6"/></svg>
               )}
-              {soundOn ? 'Son activé' : 'Activer le son'}
+              {soundOn ? 'Tester le son' : 'Activer le son'}
             </button>
             <button className="z-kds-ghost" onClick={() => setSettingsOpen(true)}>
               <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>

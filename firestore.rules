@@ -1,11 +1,27 @@
 rules_version = '2';
-// PROJET DEMO (pizzas-du-soleil) — aucune auth, aucune donnee reelle.
-// Acces ouvert volontairement pour la demo cross-device (commande client -> ecran cuisine).
-// En production client : auth obligatoire + regles strictes (cf. CLAUDE.md).
+// Projet dedie pizzas-du-soleil. Pas d'auth cote app pour l'instant (l'ecran
+// cuisine et le suivi client lisent sans login), donc la lecture reste ouverte ;
+// les ecritures sont en revanche cadrees (collection unique, creation validee,
+// mise a jour limitee au statut). Verrouillage complet (auth + lecture privee)
+// = etape suivante (Firebase Auth anonyme client + compte cuisine).
 service cloud.firestore {
   match /databases/{database}/documents {
+    match /pds_orders/{id} {
+      allow read: if true;
+      allow create: if request.resource.data.status == 'recue'
+        && request.resource.data.total is number
+        && request.resource.data.total >= 0
+        && request.resource.data.total < 1000
+        && request.resource.data.items is list
+        && request.resource.data.items.size() > 0
+        && request.resource.data.items.size() <= 60;
+      allow update: if request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status'])
+        && request.resource.data.status in ['recue', 'preparation', 'prete', 'terminee', 'refusee', 'annulee'];
+      allow delete: if true;
+    }
+    // Tout le reste est verrouille.
     match /{document=**} {
-      allow read, write: if true;
+      allow read, write: if false;
     }
   }
 }

@@ -41,26 +41,42 @@ const SCHEDULE = {
   6: [['11:00', '14:00'], ['18:30', '23:00']], // Samedi
 };
 
+const JOURS = ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'];
+const hhmm = (d) => `${d.getHours()}h${String(d.getMinutes()).padStart(2, '0')}`;
+
+/* Libelle jour relatif : Aujourd'hui / Demain / nom du jour. */
+function dayLabel(off, date) {
+  if (off === 0) return "Aujourd'hui";
+  if (off === 1) return 'Demain';
+  return JOURS[date.getDay()];
+}
+
+/* Texte humain complet d'un creneau (recap, confirmation, cuisine). */
+function slotText(s) {
+  if (!s) return '';
+  if (s.asap) return 'Dès que possible';
+  return s.day === "Aujourd'hui" ? s.time : `${s.day} ${s.time}`;
+}
+
 function generateSlots() {
   const DAY = 24 * 3600 * 1000;
   const now = new Date();
   const minStart = new Date(now.getTime() + 20 * 60 * 1000); // 20 min de prépa mini
-  const at = (hhmm, dayOffset) => {
-    const [h, m] = hhmm.split(':').map(Number);
+  const at = (str, dayOffset) => {
+    const [h, m] = str.split(':').map(Number);
     const d = new Date(now); d.setHours(h, m, 0, 0);
     return new Date(d.getTime() + dayOffset * DAY);
   };
   const slots = [];
   let asapDone = false;
 
-  for (let off = 0; off < 8 && slots.length < 10; off++) {
+  for (let off = 0; off < 8 && slots.length < 12; off++) {
     const probe = new Date(now.getTime() + off * DAY);
     const periods = SCHEDULE[probe.getDay()] || [];
-    const labelDay = off === 1 ? ' (demain)' : off > 1
-      ? ` (${['dim', 'lun', 'mar', 'mer', 'jeu', 'ven', 'sam'][probe.getDay()]}.)` : '';
+    const dl = dayLabel(off, probe);
 
     for (const [o, c] of periods) {
-      if (slots.length >= 10) break;
+      if (slots.length >= 12) break;
       const open = at(o, off);
       const close = at(c, off);
       let start;
@@ -69,21 +85,20 @@ function generateSlots() {
         start = minStart < open ? new Date(open) : new Date(minStart);
         start.setMinutes(Math.ceil(start.getMinutes() / 15) * 15, 0, 0);
         if (!asapDone && now >= open && now <= close) {
-          slots.push({ id: 'asap', label: 'Dès que possible', asap: true, eta: 20 });
+          slots.push({ id: 'asap', asap: true, eta: 20, day: "Aujourd'hui", time: hhmm(minStart), timeMs: minStart.getTime() });
           asapDone = true;
         }
       } else {
         start = new Date(open);
       }
-      let first = true;
-      for (let t = new Date(start); t <= close && slots.length < 10; t = new Date(t.getTime() + 15 * 60 * 1000)) {
+      for (let t = new Date(start); t <= close && slots.length < 12; t = new Date(t.getTime() + 15 * 60 * 1000)) {
         slots.push({
           id: `${t.getDate()}-${t.getHours()}:${t.getMinutes()}`,
-          label: `${t.getHours()}h${String(t.getMinutes()).padStart(2, '0')}${first ? labelDay : ''}`,
-          time: new Date(t),
-          eta: 20,
+          asap: false,
+          day: dl,
+          time: hhmm(t),
+          timeMs: t.getTime(),
         });
-        first = false;
       }
     }
   }
@@ -197,7 +212,9 @@ export default function Order() {
       phone: address.phone,
       address: isDelivery && selectedAddress ? selectedAddress.label : null,
       note: address.note,
-      slot: selectedSlot ? selectedSlot.label : null,
+      slot: slotText(selectedSlot),
+      slotTime: selectedSlot ? selectedSlot.timeMs : Date.now(),
+      asap: selectedSlot ? Boolean(selectedSlot.asap) : false,
       items: items.map((it) => ({
         name: it.name, qty: it.qty || 1, price: it.price, size: it.size || null,
         removed: it.removed || [], extras: it.extras || [],
@@ -594,8 +611,8 @@ export default function Order() {
                       data-active={selectedSlot?.id === s.id}
                       onClick={() => setSelectedSlot(s)}
                     >
-                      <span className="z-slot-time">{s.label}</span>
-                      <span className="z-slot-eta">~ {s.eta} min</span>
+                      <span className="z-slot-time">{s.asap ? 'Dès que possible' : s.time}</span>
+                      <span className="z-slot-eta">{s.asap ? `~ ${s.eta} min` : s.day}</span>
                     </button>
                   ))}
                 </div>
@@ -641,7 +658,7 @@ export default function Order() {
                   <div className="z-recap-row">
                     <span className="z-recap-label">Créneau</span>
                     <span className="z-recap-value">
-                      {selectedSlot?.label} ({selectedSlot?.eta} min)
+                      {slotText(selectedSlot)}{selectedSlot?.asap ? ` (~ ${selectedSlot.eta} min)` : ''}
                     </span>
                   </div>
                   <div className="z-recap-row">
@@ -715,12 +732,11 @@ export default function Order() {
 
                 <h3 className="z-success-title">Commande confirmée&nbsp;!</h3>
                 <p className="z-success-sub">
-                  Merci {address.firstName}. Votre commande <strong>{orderCode}</strong> est dans le four.{' '}
-                  {isDelivery
-                    ? <>On arrive chez vous vers <strong>{selectedSlot?.label}</strong>.</>
-                    : mode === 'emporter'
-                      ? <>À récupérer vers <strong>{selectedSlot?.label}</strong> au 7 avenue François Mitterrand.</>
-                      : <>Votre table vous attend vers <strong>{selectedSlot?.label}</strong>.</>}
+                  Merci {address.firstName}. Votre commande <strong>{orderCode}</strong>{' '}
+                  {selectedSlot?.asap ? 'est en préparation.' : <>est programmée pour <strong>{slotText(selectedSlot)}</strong>.</>}{' '}
+                  {mode === 'emporter'
+                    ? <>À récupérer {selectedSlot?.asap ? 'dès qu\'elle est prête' : `vers ${slotText(selectedSlot)}`} au 7 avenue François Mitterrand.</>
+                    : <>Votre table vous attend {selectedSlot?.asap ? 'au plus vite' : `vers ${slotText(selectedSlot)}`}.</>}
                 </p>
 
                 <div className="z-success-detail">

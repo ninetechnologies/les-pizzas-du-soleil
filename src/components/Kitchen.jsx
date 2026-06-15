@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { getOrders, subscribe, updateStatus, clearOrders } from '../lib/orders.js';
-import { primeAudio, playAlarm } from '../lib/sound.js';
+import { primeAudio, playAlarm, beep, audioReady } from '../lib/sound.js';
 
 const fmt = (n) => n.toFixed(2).replace('.', ',') + ' €';
 const STATUS = [
@@ -28,26 +28,43 @@ const timeStr = (ts) => {
 // Alarme cuisine deportee dans lib/sound.js (alias local pour limiter le diff).
 const alarm = playAlarm;
 
+// Une commande est "a preparer" si ASAP, sans heure prevue (legacy), ou si son
+// creneau est dans moins de 45 min. Sinon elle est "programmee" (plus tard).
+const SOON_MS = 45 * 60 * 1000;
+const isSoon = (o) => o.asap || !o.slotTime || (o.slotTime - Date.now() <= SOON_MS);
+
 export default function Kitchen({ onLogout }) {
   const [orders, setOrders] = useState([]);
   const [printer, setPrinter] = useState({ connected: false, auto: false });
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [ticket, setTicket] = useState(null);
   const [flash, setFlash] = useState(false);
-  const prevCount = useRef(0);
+  const [soundOn, setSoundOn] = useState(() => audioReady());
+  const [, setTick] = useState(0); // force le regroupement (promotion programmee -> a faire)
+  const announced = useRef(new Set()); // commandes deja signalees par l'alarme
+
+  const flashOn = (ms) => { setFlash(true); setTimeout(() => setFlash(false), ms); };
 
   useEffect(() => {
-    setOrders(getOrders());
-    prevCount.current = getOrders().length;
+    const initial = getOrders();
+    setOrders(initial);
+    // au chargement, ne pas (re)sonner pour les commandes deja la
+    initial.forEach((o) => announced.current.add(o.code));
     const unsub = subscribe((list) => {
       setOrders(list);
-      if (list.length > prevCount.current) {
+      // alarme uniquement pour une nouvelle commande IMMINENTE (pas les programmees lointaines)
+      let nouvelle = false;
+      list.forEach((o) => {
+        if (o.status === 'recue' && isSoon(o) && !announced.current.has(o.code)) {
+          announced.current.add(o.code);
+          nouvelle = true;
+        }
+      });
+      if (nouvelle) {
         alarm();
-        setFlash(true);
-        setTimeout(() => setFlash(false), 2200);
+        flashOn(2200);
         if (printer.connected && printer.auto) doPrint(list[0]);
       }
-      prevCount.current = list.length;
     });
     return unsub;
   }, [printer.connected, printer.auto]);
@@ -80,17 +97,27 @@ export default function Kitchen({ onLogout }) {
     };
   }, []);
 
-  // Relance l'alarme toutes les 20 s tant qu'une commande n'a pas ete demarree
+  // Toutes les 15 s : regroupe (une programmee devient "a faire" a l'approche),
+  // signale les commandes qui viennent de devenir imminentes, et relance l'alarme
+  // tant qu'une commande imminente n'a pas ete demarree.
   useEffect(() => {
     const id = setInterval(() => {
-      if (getOrders().some((o) => o.status === 'recue')) {
+      setTick((t) => t + 1);
+      const list = getOrders();
+      list.forEach((o) => {
+        if (o.status === 'recue' && isSoon(o) && !announced.current.has(o.code)) {
+          announced.current.add(o.code); // promotion programmee -> imminente
+        }
+      });
+      if (list.some((o) => o.status === 'recue' && isSoon(o))) {
         alarm();
-        setFlash(true);
-        setTimeout(() => setFlash(false), 1500);
+        flashOn(1500);
       }
-    }, 20000);
+    }, 15000);
     return () => clearInterval(id);
   }, []);
+
+  const enableSound = () => { const ok = primeAudio(); beep(); setSoundOn(ok || audioReady()); };
 
   const doPrint = (order) => {
     setTicket(order);
@@ -101,6 +128,70 @@ export default function Kitchen({ onLogout }) {
   const CLOSED_LABEL = { terminee: 'Terminée', refusee: 'Refusée', annulee: 'Annulée' };
   const active = orders.filter((o) => !CLOSED.includes(o.status));
   const done = orders.filter((o) => CLOSED.includes(o.status));
+  // A preparer maintenant vs programmees plus tard (par heure de creneau)
+  const aFaire = active.filter(isSoon);
+  const programmees = active
+    .filter((o) => !isSoon(o))
+    .sort((a, b) => (a.slotTime || 0) - (b.slotTime || 0));
+
+  const renderCard = (o) => (
+    <div key={o.code} className="z-tk" data-status={o.status}>
+      <div className={`z-tk-when${o.asap ? ' z-tk-when-asap' : ''}`}>
+        {o.asap
+          ? 'Dès que possible'
+          : <>Pour <strong>{o.slot}</strong></>}
+      </div>
+      <div className="z-tk-head">
+        <strong>{o.code}</strong>
+        <span className="z-tk-mode">{o.modeLabel}</span>
+        <span className="z-tk-time">{timeStr(o.createdAt)}</span>
+      </div>
+      <div className="z-tk-meta">
+        {o.name && <span>{o.name}</span>}
+        <span className="z-tk-pay" data-pay={o.payment}>{o.payment === 'place' ? 'Sur place' : o.payment === 'especes' ? 'Espèces' : 'Carte'}</span>
+      </div>
+      <ul className="z-tk-items">
+        {o.items.map((it, i) => (
+          <li key={i}>
+            <span className="z-tk-qty">{it.qty}x</span>
+            <span>
+              <b>{it.name}</b>
+              {it.size && <em className="z-tk-sz"> {it.size}</em>}
+              {it.removed?.length > 0 && <em className="z-tk-rm"> sans {it.removed.join(', ').toLowerCase()}</em>}
+              {it.extras?.length > 0 && <em className="z-tk-ex"> {it.extras.map((e) => e.label).join(', ')}</em>}
+            </span>
+          </li>
+        ))}
+      </ul>
+      {o.address && <div className="z-tk-addr">Livraison : {o.address}</div>}
+      <div className="z-tk-foot">
+        <span className="z-tk-status" data-status={o.status}>{STATUS.find((s) => s.id === o.status)?.label}</span>
+        <span className="z-tk-total">{fmt(o.total)}</span>
+      </div>
+      <div className="z-tk-cta">
+        <button className="z-tk-print" onClick={() => doPrint(o)} title="Imprimer le ticket">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M6 9V2h12v7M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><path d="M6 14h12v8H6z"/></svg>
+          Ticket
+        </button>
+        <button className={`z-tk-act ${ACTION[o.status].cls}`} onClick={() => updateStatus(o.code, nextStatus(o.status))}>
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round"><path d={ACTION[o.status].icon}/></svg>
+          {ACTION[o.status].label}
+        </button>
+      </div>
+      {o.status === 'recue' && (
+        <div className="z-tk-cta2">
+          <button className="z-tk-refuse" onClick={() => updateStatus(o.code, 'refusee')}>
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+            Refuser
+          </button>
+          <button className="z-tk-cancel" onClick={() => updateStatus(o.code, 'annulee')}>
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9 9 0 0 0-9 9zM3 3l18 18"/></svg>
+            Annuler
+          </button>
+        </div>
+      )}
+    </div>
+  );
 
   return (
     <>
@@ -113,6 +204,14 @@ export default function Kitchen({ onLogout }) {
             <em>{active.length} en cours</em>
           </div>
           <div className="z-kds-actions">
+            <button className="z-kds-sound" data-on={soundOn} onClick={enableSound} aria-label="Activer le son des nouvelles commandes">
+              {soundOn ? (
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M15.5 8.5a5 5 0 0 1 0 7M19 5a9 9 0 0 1 0 14"/></svg>
+              ) : (
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M22 9l-6 6M16 9l6 6"/></svg>
+              )}
+              {soundOn ? 'Son activé' : 'Activer le son'}
+            </button>
             <button className="z-kds-ghost" onClick={() => setSettingsOpen(true)}>
               <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
               Imprimante
@@ -132,62 +231,17 @@ export default function Kitchen({ onLogout }) {
               <small>Les nouvelles commandes apparaissent ici en direct, avec une sonnerie. Laissez cette page ouverte.</small>
             </div>
           )}
-          <div className="z-kds-grid">
-            {active.map((o) => (
-              <div key={o.code} className="z-tk" data-status={o.status}>
-                <div className="z-tk-head">
-                  <strong>{o.code}</strong>
-                  <span className="z-tk-mode">{o.modeLabel}</span>
-                  <span className="z-tk-time">{timeStr(o.createdAt)}</span>
-                </div>
-                <div className="z-tk-meta">
-                  {o.name && <span>{o.name}</span>}
-                  {o.slot && <span>· {o.slot}</span>}
-                  <span className="z-tk-pay" data-pay={o.payment}>{o.payment === 'place' ? 'Sur place' : o.payment === 'especes' ? 'Espèces' : 'Carte'}</span>
-                </div>
-                <ul className="z-tk-items">
-                  {o.items.map((it, i) => (
-                    <li key={i}>
-                      <span className="z-tk-qty">{it.qty}x</span>
-                      <span>
-                        <b>{it.name}</b>
-                        {it.size && <em className="z-tk-sz"> {it.size}</em>}
-                        {it.removed?.length > 0 && <em className="z-tk-rm"> sans {it.removed.join(', ').toLowerCase()}</em>}
-                        {it.extras?.length > 0 && <em className="z-tk-ex"> {it.extras.map((e) => e.label).join(', ')}</em>}
-                      </span>
-                    </li>
-                  ))}
-                </ul>
-                {o.address && <div className="z-tk-addr">Livraison : {o.address}</div>}
-                <div className="z-tk-foot">
-                  <span className="z-tk-status" data-status={o.status}>{STATUS.find((s) => s.id === o.status)?.label}</span>
-                  <span className="z-tk-total">{fmt(o.total)}</span>
-                </div>
-                <div className="z-tk-cta">
-                  <button className="z-tk-print" onClick={() => doPrint(o)} title="Imprimer le ticket">
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M6 9V2h12v7M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><path d="M6 14h12v8H6z"/></svg>
-                    Ticket
-                  </button>
-                  <button className={`z-tk-act ${ACTION[o.status].cls}`} onClick={() => updateStatus(o.code, nextStatus(o.status))}>
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round"><path d={ACTION[o.status].icon}/></svg>
-                    {ACTION[o.status].label}
-                  </button>
-                </div>
-                {o.status === 'recue' && (
-                  <div className="z-tk-cta2">
-                    <button className="z-tk-refuse" onClick={() => updateStatus(o.code, 'refusee')}>
-                      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
-                      Refuser
-                    </button>
-                    <button className="z-tk-cancel" onClick={() => updateStatus(o.code, 'annulee')}>
-                      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9 9 0 0 0-9 9zM3 3l18 18"/></svg>
-                      Annuler
-                    </button>
-                  </div>
-                )}
+          {aFaire.length > 0 && <div className="z-kds-grid">{aFaire.map(renderCard)}</div>}
+
+          {programmees.length > 0 && (
+            <div className="z-kds-prog">
+              <div className="z-kds-prog-h">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+                Programmées plus tard ({programmees.length})
               </div>
-            ))}
-          </div>
+              <div className="z-kds-grid">{programmees.map(renderCard)}</div>
+            </div>
+          )}
 
           {done.length > 0 && (
             <div className="z-kds-done">
@@ -247,7 +301,7 @@ export default function Kitchen({ onLogout }) {
             <div className="pds-tk-sub">7 avenue François Mitterrand · Saint-Gaudens<br/>05 61 94 33 29</div>
             <div className="pds-tk-rule" />
             <div className="pds-tk-line"><b>{ticket.code}</b><span>{timeStr(ticket.createdAt)}</span></div>
-            <div className="pds-tk-line"><span>{ticket.modeLabel}</span><span>{ticket.slot}</span></div>
+            <div className="pds-tk-line"><span>{ticket.modeLabel}</span><b>{ticket.asap ? 'DÈS QUE POSSIBLE' : `POUR ${ticket.slot}`}</b></div>
             {ticket.name && <div className="pds-tk-sm">{ticket.name} · {ticket.phone}</div>}
             {ticket.address && <div className="pds-tk-sm">{ticket.address}</div>}
             <div className="pds-tk-rule" />
@@ -282,6 +336,10 @@ export default function Kitchen({ onLogout }) {
         .z-kds-dot { width: 10px; height: 10px; border-radius: 50%; background: #3ad17a; box-shadow: 0 0 0 0 rgba(58,209,122,.5); animation: kpulse 2s infinite; }
         @keyframes kpulse { 0%{box-shadow:0 0 0 0 rgba(58,209,122,.5)} 70%{box-shadow:0 0 0 9px rgba(58,209,122,0)} 100%{box-shadow:0 0 0 0 rgba(58,209,122,0)} }
         .z-kds-actions { display: flex; align-items: center; gap: 10px; }
+        .z-kds-sound { display: inline-flex; align-items: center; gap: 8px; padding: 9px 14px; border-radius: 10px; background: rgba(255,255,255,.07); color: #fff; font-weight: 700; font-size: .85rem; }
+        .z-kds-sound[data-on="true"] { background: rgba(58,209,122,.18); color: #6ee79e; }
+        .z-kds-sound[data-on="false"] { background: rgba(247,168,30,.2); color: #f5c372; animation: zsndpulse 1.6s infinite; }
+        @keyframes zsndpulse { 0%,100%{opacity:1} 50%{opacity:.55} }
         .z-kds-ghost { display: inline-flex; align-items: center; gap: 8px; padding: 9px 14px; border-radius: 10px; background: rgba(255,255,255,.07); color: #fff; font-weight: 600; font-size: .85rem; }
         .z-kds-ghost:hover { background: rgba(255,255,255,.13); }
         .z-kds-pstate { font-size: .7rem; padding: 2px 8px; border-radius: 999px; background: rgba(255,255,255,.1); color: rgba(255,255,255,.6); }
@@ -298,6 +356,13 @@ export default function Kitchen({ onLogout }) {
         .z-tk { background: #1d1713; border: 1px solid rgba(255,255,255,.1); border-radius: 16px; padding: 16px; display: flex; flex-direction: column; gap: 10px; border-left: 4px solid var(--z-gold); }
         .z-tk[data-status="preparation"] { border-left-color: #f59e0b; }
         .z-tk[data-status="prete"] { border-left-color: #3ad17a; }
+        .z-tk-when {
+          display: inline-flex; align-items: center; align-self: flex-start; gap: 6px;
+          font-weight: 800; font-size: .92rem; padding: 5px 12px; border-radius: 999px;
+          background: rgba(99,179,237,.16); color: #9cd0f5; letter-spacing: .01em;
+        }
+        .z-tk-when strong { color: #fff; font-weight: 800; }
+        .z-tk-when-asap { background: rgba(58,209,122,.18); color: #6ee79e; }
         .z-tk-head { display: flex; align-items: center; gap: 10px; }
         .z-tk-head strong { font-family: var(--z-font-display); font-size: 1.2rem; }
         .z-tk-mode { font-size: .72rem; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; background: rgba(255,255,255,.1); padding: 3px 9px; border-radius: 999px; }
@@ -359,6 +424,9 @@ export default function Kitchen({ onLogout }) {
         .z-tk-refuse:hover { background: var(--z-danger); color: #fff; }
         .z-tk-cancel { background: rgba(255,255,255,.07); color: rgba(255,255,255,.75); border-color: rgba(255,255,255,.18); }
         .z-tk-cancel:hover { background: rgba(255,255,255,.16); color: #fff; }
+        .z-kds-prog { margin-top: 26px; padding-top: 16px; border-top: 1px dashed rgba(255,255,255,.16); }
+        .z-kds-prog-h { display: flex; align-items: center; gap: 8px; font-weight: 700; color: var(--z-gold); font-size: .9rem; margin-bottom: 14px; letter-spacing: .02em; }
+        .z-kds-prog .z-tk { opacity: .82; border-left-color: #63b3ed; }
         .z-kds-done { margin-top: 22px; padding-top: 16px; border-top: 1px solid rgba(255,255,255,.1); }
         .z-kds-done-h { display: flex; align-items: center; gap: 12px; font-weight: 700; color: rgba(255,255,255,.6); font-size: .85rem; margin-bottom: 10px; }
         .z-kds-done-h button { margin-left: auto; color: rgba(255,255,255,.5); text-decoration: underline; font-size: .8rem; }

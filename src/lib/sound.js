@@ -1,7 +1,7 @@
 /**
  * Son de l'ecran cuisine. Sur mobile, l'audio est bloque tant qu'un geste
- * utilisateur n'a pas "debloque" l'AudioContext. On l'amorce au moment de la
- * connexion (clic) puis on le reutilise pour l'alarme des nouvelles commandes.
+ * utilisateur n'a pas "debloque" l'AudioContext. On l'amorce dans un geste
+ * (clic connexion, bouton "activer le son", 1er tap) puis on le reutilise.
  */
 let ctx = null;
 
@@ -13,8 +13,41 @@ function ensureCtx() {
   return ctx;
 }
 
-/* A appeler dans un gestionnaire de geste utilisateur (clic connexion, 1er tap). */
-export function primeAudio() { ensureCtx(); }
+/* A appeler DANS un gestionnaire de geste utilisateur. Joue un buffer silencieux,
+   indispensable pour debloquer l'audio sur iOS Safari. Retourne true si actif. */
+export function primeAudio() {
+  const c = ensureCtx();
+  if (!c) return false;
+  try {
+    const b = c.createBuffer(1, 1, 22050);
+    const src = c.createBufferSource();
+    src.buffer = b;
+    src.connect(c.destination);
+    src.start(0);
+  } catch (e) {}
+  return c.state === 'running';
+}
+
+export function audioReady() {
+  return Boolean(ctx) && ctx.state === 'running';
+}
+
+/* Bip court de confirmation (test du son). */
+export function beep() {
+  const c = ensureCtx();
+  if (!c) return;
+  try {
+    const t = c.currentTime;
+    const o = c.createOscillator();
+    const g = c.createGain();
+    o.connect(g); g.connect(c.destination);
+    o.type = 'sine'; o.frequency.value = 880;
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.exponentialRampToValueAtTime(0.3, t + 0.02);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + 0.28);
+    o.start(t); o.stop(t + 0.3);
+  } catch (e) {}
+}
 
 /* Alarme cuisine : bip aigu repete ~2,5 s, pensee pour les coups de feu. */
 export function playAlarm() {

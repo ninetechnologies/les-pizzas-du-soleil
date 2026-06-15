@@ -244,16 +244,15 @@ export const LOCATIONS = [
       "https://maps.google.com/maps?q=7+avenue+Francois+Mitterrand+31800+Saint-Gaudens&t=&z=16&ie=UTF8&iwloc=&output=embed",
     mapsDir:
       "https://www.google.com/maps/dir/?api=1&destination=7+avenue+Francois+Mitterrand+31800+Saint-Gaudens",
-    // NOTE : le PDF de Marie indique Ven-Sam 18h30-22h15 et Dim 18h30-22h00 (sans service midi).
-    // Conserve ici les horaires confirmes le 09/06 (avec service midi) — a trancher au RDV.
+    // Horaires confirmes MA 15/06 : Ven-Sam-Dim, le service du soir ouvre a 18h30.
     hours: [
       { day: 'Lundi', value: 'Fermé', closed: true },
       { day: 'Mardi', value: '11h00 - 14h00 et 19h00 - 22h00' },
       { day: 'Mercredi', value: '11h00 - 14h00 et 19h00 - 22h00' },
       { day: 'Jeudi', value: '11h00 - 14h00 et 19h00 - 22h00' },
-      { day: 'Vendredi', value: '11h00 - 14h00 et 19h00 - 23h00' },
-      { day: 'Samedi', value: '11h00 - 14h00 et 19h00 - 23h00' },
-      { day: 'Dimanche', value: '19h00 - 23h00' },
+      { day: 'Vendredi', value: '11h00 - 14h00 et 18h30 - 23h00' },
+      { day: 'Samedi', value: '11h00 - 14h00 et 18h30 - 23h00' },
+      { day: 'Dimanche', value: '18h30 - 23h00' },
     ],
   },
 ];
@@ -261,21 +260,20 @@ export const LOCATIONS = [
 /* Horaires en version courte pour l'affichage (Location). Source unique : a garder
    en phase avec LOCATIONS.hours et SERVICE_HOURS ci-dessous si Marie change ses horaires. */
 export const HOURS_SHORT =
-  'Mar-Jeu : 11h-14h et 19h-22h · Ven-Sam : 11h-14h et 19h-23h · Dim : 19h-23h · Fermé le lundi';
+  'Mar-Jeu : 11h-14h et 19h-22h · Ven-Sam : 11h-14h et 18h30-23h · Dim : 18h30-23h · Fermé le lundi';
 
 /* Horaires consolides Les Pizzas du Soleil (services midi + soir).
-   Mar-Jeu 11h-14h / 19h-22h · Ven-Sam 11h-14h / 19h-23h · Dim 19h-23h · Lundi ferme.
-   (Le PDF carte indique des horaires soir uniquement Ven-Dim — a confirmer au RDV.)
+   Mar-Jeu 11h-14h / 19h-22h · Ven-Sam 11h-14h / 18h30-23h · Dim 18h30-23h · Lundi ferme.
    La generation des creneaux est dans Order.jsx (SCHEDULE). */
 export const SERVICE_HOURS = {
   byWeekday: {
-    0: [['19:00', '23:00']],                       // Dimanche (soir seulement)
+    0: [['18:30', '23:00']],                       // Dimanche (soir seulement)
     1: null,                                       // Lundi ferme
     2: [['11:00', '14:00'], ['19:00', '22:00']],  // Mardi
     3: [['11:00', '14:00'], ['19:00', '22:00']],  // Mercredi
     4: [['11:00', '14:00'], ['19:00', '22:00']],  // Jeudi
-    5: [['11:00', '14:00'], ['19:00', '23:00']],  // Vendredi
-    6: [['11:00', '14:00'], ['19:00', '23:00']],  // Samedi
+    5: [['11:00', '14:00'], ['18:30', '23:00']],  // Vendredi
+    6: [['11:00', '14:00'], ['18:30', '23:00']],  // Samedi
   },
   slotMinutes: 15,
 };

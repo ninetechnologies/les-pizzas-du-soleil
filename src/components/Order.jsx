@@ -28,17 +28,17 @@ const STEPS = [
 const fmt = (n) => n.toFixed(2).replace('.', ',') + ' €';
 
 /* Creneaux Les Pizzas du Soleil — services selon le jour.
- * Mar-Jeu : 11h00-14h00 et 19h00-22h00 · Ven-Sam : 11h00-14h00 et 19h00-23h00
- * Dim : 19h00-23h00 (soir uniquement) · Lundi ferme.
+ * Mar-Jeu : 11h00-14h00 et 19h00-22h00 · Ven-Sam : 11h00-14h00 et 18h30-23h00
+ * Dim : 18h30-23h00 (soir uniquement) · Lundi ferme.
  * 0=Dim, 1=Lun, ... 6=Sam */
 const SCHEDULE = {
-  0: [['19:00', '23:00']],                      // Dimanche (soir seulement)
+  0: [['18:30', '23:00']],                      // Dimanche (soir seulement)
   1: [],                                        // Lundi ferme
   2: [['11:00', '14:00'], ['19:00', '22:00']], // Mardi
   3: [['11:00', '14:00'], ['19:00', '22:00']], // Mercredi
   4: [['11:00', '14:00'], ['19:00', '22:00']], // Jeudi
-  5: [['11:00', '14:00'], ['19:00', '23:00']], // Vendredi
-  6: [['11:00', '14:00'], ['19:00', '23:00']], // Samedi
+  5: [['11:00', '14:00'], ['18:30', '23:00']], // Vendredi
+  6: [['11:00', '14:00'], ['18:30', '23:00']], // Samedi
 };
 
 function generateSlots() {

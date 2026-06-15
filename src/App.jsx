@@ -10,6 +10,7 @@ import Location from './components/Location.jsx';
 import Footer from './components/Footer.jsx';
 import CartBubble from './components/CartBubble.jsx';
 import FloatingActions from './components/FloatingActions.jsx';
+import LegalModal from './components/Legal.jsx';
 
 export default function App() {
   useEffect(() => {
@@ -57,6 +58,7 @@ export default function App() {
       <Footer />
       <CartBubble />
       <FloatingActions />
+      <LegalModal />
     </CartProvider>
   );
 }

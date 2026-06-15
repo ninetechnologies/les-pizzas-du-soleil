@@ -1,6 +1,7 @@
 import React from 'react';
 import { motion } from 'motion/react';
 import Logo from './Logo.jsx';
+import { openLegal } from './Legal.jsx';
 
 // TODO remplacer par le vrai lien Google Business quand la fiche est creee
 const GOOGLE = 'https://www.google.com/search?q=Les+Pizzas+du+Soleil+Saint-Gaudens';
@@ -63,9 +64,9 @@ export default function Footer() {
         <div className="z-footer-bottom">
           <span>&copy; {new Date().getFullYear()} Les Pizzas du Soleil · Saint-Gaudens</span>
           <span className="z-footer-legal">
-            <a href="#">Informations légales en cours de mise à jour</a>
+            <button type="button" onClick={() => openLegal('mentions')}>Mentions légales</button>
             <span>·</span>
-            <a href="#">Politique de confidentialité</a>
+            <button type="button" onClick={() => openLegal('confidentialite')}>Politique de confidentialité</button>
           </span>
         </div>
 
@@ -98,9 +99,9 @@ export default function Footer() {
           padding-top: 28px; display: flex; flex-wrap: wrap; justify-content: space-between;
           gap: 16px; font-size: 0.78rem; color: rgba(255, 255, 255, 0.45);
         }
-        .z-footer-legal { display: inline-flex; gap: 8px; }
-        .z-footer-legal a { color: rgba(255, 255, 255, 0.5); }
-        .z-footer-legal a:hover { color: var(--z-white); }
+        .z-footer-legal { display: inline-flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+        .z-footer-legal a, .z-footer-legal button { color: rgba(255, 255, 255, 0.5); background: none; border: none; padding: 0; font: inherit; cursor: pointer; }
+        .z-footer-legal a:hover, .z-footer-legal button:hover { color: var(--z-white); }
         .z-footer-credit {
           margin: 18px 0 0; font-size: 0.74rem; color: var(--z-gold); opacity: 0.85; font-weight: 600;
           display: flex; align-items: center; gap: 14px; flex-wrap: wrap;

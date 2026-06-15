@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { useCart } from '../hooks/useCart.jsx';
 import { placeOrder, subscribe, getOrders } from '../lib/orders.js';
 import { addStamp, getCard, GOAL } from '../lib/loyalty.js';
+import { openLegal } from './Legal.jsx';
 
 function chime() {
   try {
@@ -125,6 +126,7 @@ export default function Order() {
   const [liveStatus, setLiveStatus] = useState('recue'); // suivi temps réel côté client
   const [loyalty, setLoyalty] = useState(null); // carte de fidélité (aperçu puis crédit à la récupération)
   const stamped = useRef(false); // évite de créditer le tampon deux fois
+  const [consent, setConsent] = useState(false); // consentement RGPD avant validation
   const slots = generateSlots();
   const deliveryFee = mode === 'livraison' ? 2.5 : 0;
   const isDelivery = mode === 'livraison';
@@ -246,6 +248,7 @@ export default function Order() {
     setOrderCode(null);
     setLoyalty(null);
     stamped.current = false;
+    setConsent(false);
   };
 
   return (
@@ -708,11 +711,22 @@ export default function Order() {
                   </div>
                 </div>
 
+                <label className="z-consent">
+                  <input type="checkbox" checked={consent} onChange={(e) => setConsent(e.target.checked)} />
+                  <span>
+                    J'accepte que mon nom et mon téléphone soient utilisés pour traiter ma
+                    commande, conformément à la{' '}
+                    <button type="button" className="z-consent-link" onClick={() => openLegal('confidentialite')}>
+                      politique de confidentialité
+                    </button>.
+                  </span>
+                </label>
+
                 <div className="z-step-actions">
                   <button className="z-btn-ghost-dark" onClick={() => setStep('time')}>
                     Retour
                   </button>
-                  <button className="z-btn z-btn-primary z-btn-pay" onClick={handlePay}>
+                  <button className="z-btn z-btn-primary z-btn-pay" onClick={handlePay} disabled={!consent}>
                     Confirmer la commande · {fmt(total + deliveryFee)}
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
                       <path d="M5 12l5 5L20 7" />
@@ -821,8 +835,8 @@ export default function Order() {
                 )}
 
                 <p className="z-success-note">
-                  Vous serez prévenu (notification + SMS) dès que votre commande est prête.
-                  Démo : aucune commande réelle n'est passée, aucun paiement débité.
+                  Gardez cette page ouverte : vous êtes prévenu par notification dès que
+                  votre commande est prête.
                 </p>
 
                 <div className="z-success-cta">
@@ -1359,6 +1373,12 @@ export default function Order() {
         .z-pay-onsite > svg { color: var(--z-green); flex-shrink: 0; }
         .z-pay-onsite strong { display: block; font-weight: 600; font-size: 0.95rem; }
         .z-pay-onsite small { display: block; font-size: 0.74rem; color: var(--z-text-muted); }
+        .z-consent {
+          display: flex; align-items: flex-start; gap: 10px; margin: 18px 0 4px;
+          font-size: 0.84rem; color: var(--z-text); line-height: 1.45; cursor: pointer;
+        }
+        .z-consent input { width: 18px; height: 18px; margin-top: 1px; accent-color: var(--z-green); flex-shrink: 0; }
+        .z-consent-link { color: var(--z-red); font-weight: 600; text-decoration: underline; background: none; border: none; padding: 0; font: inherit; cursor: pointer; }
         .z-mode {
           display: grid;
           grid-template-columns: repeat(2, 1fr);

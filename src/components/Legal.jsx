@@ -115,8 +115,64 @@ function Confidentialite() {
   );
 }
 
+function CGV() {
+  return (
+    <>
+      <h2>Conditions générales de vente</h2>
+
+      <h3>Objet</h3>
+      <p>
+        Les présentes conditions régissent les commandes passées en ligne auprès de
+        <strong> Les Pizzas du Soleil</strong> (SAS BD SYLHET), 7 avenue François
+        Mitterrand, 31800 Saint-Gaudens, pour une consommation sur place ou à emporter.
+      </p>
+
+      <h3>Prix</h3>
+      <p>
+        Les prix sont indiqués en euros, toutes taxes comprises. Ils peuvent être modifiés
+        à tout moment, le tarif applicable étant celui affiché au moment de la commande.
+      </p>
+
+      <h3>Commande et retrait</h3>
+      <p>
+        La commande est validée après choix d'un créneau. Elle est préparée pour une
+        consommation sur place ou un retrait au comptoir à l'heure indiquée. Aucune
+        livraison n'est proposée. Le restaurant peut refuser ou annuler une commande
+        (rupture, affluence, fermeture exceptionnelle) ; dans ce cas, aucune somme n'est due.
+      </p>
+
+      <h3>Paiement</h3>
+      <p>
+        Le paiement s'effectue <strong>sur place</strong>, au restaurant, lors de la
+        consommation ou du retrait. Aucun paiement n'est encaissé en ligne.
+      </p>
+
+      <h3>Droit de rétractation</h3>
+      <p>
+        Conformément à l'article L221-28 du Code de la consommation, le droit de
+        rétractation ne s'applique pas aux denrées alimentaires ni aux prestations de
+        restauration fournies à une date déterminée. La commande est donc ferme.
+      </p>
+
+      <h3>Réclamations et médiation</h3>
+      <p>
+        Toute réclamation peut être adressée au restaurant au {TEL}. Conformément aux
+        articles L611-1 et suivants du Code de la consommation, le client peut recourir
+        gratuitement à un médiateur de la consommation en vue de la résolution amiable
+        d'un litige. Les coordonnées du médiateur compétent sont communiquées par le
+        restaurant sur simple demande.
+      </p>
+
+      <h3>Droit applicable</h3>
+      <p>
+        Les présentes conditions sont soumises au droit français.
+      </p>
+    </>
+  );
+}
+
 export default function LegalModal() {
-  const [doc, setDoc] = useState(null); // 'mentions' | 'confidentialite' | null
+  const [doc, setDoc] = useState(null); // 'mentions' | 'cgv' | 'confidentialite' | null
 
   useEffect(() => {
     const onOpen = (e) => setDoc(e.detail);
@@ -149,7 +205,7 @@ export default function LegalModal() {
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round"><path d="M18 6L6 18M6 6l12 12" /></svg>
             </button>
             <div className="z-legal-body">
-              {doc === 'mentions' ? <Mentions /> : <Confidentialite />}
+              {doc === 'mentions' ? <Mentions /> : doc === 'cgv' ? <CGV /> : <Confidentialite />}
             </div>
           </motion.div>
 

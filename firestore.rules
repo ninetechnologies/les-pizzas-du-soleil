@@ -2,7 +2,9 @@ rules_version = '2';
 // Projet dedie pizzas-du-soleil.
 // Modele de securite :
 //  - create  : ouvert (commande publique) mais valide (statut, total borne, items).
-//  - get     : ouvert -> le client suit SA commande via son code (lecture d'un seul doc).
+//  - get     : ouvert -> le client suit SA commande via son identifiant (lecture d'un seul doc).
+//             L'id du document est un token long non devinable (genere cote client) :
+//             impossible d'enumerer/lire les commandes d'autrui en sondant des codes courts.
 //  - list    : cuisine uniquement -> empeche d'enumerer/aspirer toutes les commandes (RGPD).
 //  - update  : cuisine uniquement, et seulement le champ statut.
 //  - delete  : cuisine uniquement (bouton "Vider").
@@ -18,10 +20,18 @@ service cloud.firestore {
       allow create: if request.resource.data.status == 'recue'
         && request.resource.data.total is number
         && request.resource.data.total >= 0
-        && request.resource.data.total < 1000
+        && request.resource.data.total < 2000
         && request.resource.data.items is list
         && request.resource.data.items.size() > 0
-        && request.resource.data.items.size() <= 60;
+        && request.resource.data.items.size() <= 60
+        && request.resource.data.createdAt is number
+        && request.resource.data.name is string
+        && request.resource.data.name.size() > 0
+        && request.resource.data.name.size() <= 80
+        && request.resource.data.phone is string
+        && request.resource.data.phone.size() <= 25
+        && (!('note' in request.resource.data) || request.resource.data.note.size() <= 300)
+        && id.size() >= 12 && id.size() <= 64;
       allow update: if isKitchen()
         && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status'])
         && request.resource.data.status in ['recue', 'preparation', 'prete', 'terminee', 'refusee', 'annulee'];

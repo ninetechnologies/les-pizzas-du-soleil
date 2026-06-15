@@ -1,8 +1,9 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import { motion, useScroll, useTransform } from 'motion/react';
 
 const HERO_POSTER = '/videos/hero-poster.jpg';
 const HERO_VIDEO = '/videos/hero-desktop.mp4';
+const HERO_VIDEO_MOBILE = '/videos/hero-mobile.mp4'; // version legere (~2,3 Mo) pour le mobile
 
 const BADGES = [
   { icon: '✦', label: 'Fait maison', sub: 'Pâte travaillée maison' },
@@ -23,6 +24,11 @@ const itemVariants = {
 
 export default function Hero() {
   const ref = useRef(null);
+  // Choix de la video selon la taille d'ecran au 1er rendu (evite de charger 6,5 Mo sur mobile).
+  const [heroVideo] = useState(() =>
+    (typeof window !== 'undefined' && window.matchMedia('(max-width: 768px)').matches)
+      ? HERO_VIDEO_MOBILE : HERO_VIDEO
+  );
   const { scrollYProgress } = useScroll({ target: ref, offset: ['start start', 'end start'] });
   const videoY = useTransform(scrollYProgress, [0, 1], ['0%', '25%']);
   const contentY = useTransform(scrollYProgress, [0, 1], ['0%', '-15%']);
@@ -40,7 +46,7 @@ export default function Hero() {
           preload="auto"
           poster={HERO_POSTER}
         >
-          <source src={HERO_VIDEO} type="video/mp4" />
+          <source src={heroVideo} type="video/mp4" />
         </video>
         <div className="z-hero-overlay" />
         <div className="z-hero-vignette" />

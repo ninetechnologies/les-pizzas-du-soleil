@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { getOrders, subscribe, updateStatus, clearOrders } from '../lib/orders.js';
-import { primeAudio, playAlarm, beep, audioReady } from '../lib/sound.js';
+import { primeAudio, playAlarm, audioReady } from '../lib/sound.js';
 
 const fmt = (n) => n.toFixed(2).replace('.', ',') + ' €';
 const STATUS = [
@@ -153,7 +153,7 @@ export default function Kitchen({ onLogout }) {
           : <>Pour <strong>{o.slot}</strong></>}
       </div>
       <div className="z-tk-head">
-        <strong>{o.code}</strong>
+        <strong>{o.ref || o.code}</strong>
         <span className="z-tk-mode">{o.modeLabel}</span>
         <span className="z-tk-time">{timeStr(o.createdAt)}</span>
       </div>
@@ -174,7 +174,6 @@ export default function Kitchen({ onLogout }) {
           </li>
         ))}
       </ul>
-      {o.address && <div className="z-tk-addr">Livraison : {o.address}</div>}
       <div className="z-tk-foot">
         <span className="z-tk-status" data-status={o.status}>{STATUS.find((s) => s.id === o.status)?.label}</span>
         <span className="z-tk-total">{fmt(o.total)}</span>
@@ -301,9 +300,9 @@ export default function Kitchen({ onLogout }) {
                   </button>
                 </div>
                 <p className="z-pset-note">
-                  Démo : "Connecter" simule l'imprimante et active l'impression. En production,
-                  l'app se relie à l'imprimante thermique du restaurant (Epson/Star réseau, ou
-                  impression navigateur sur n'importe quelle imprimante).
+                  « Connecter » active l'impression des tickets. L'app se relie à l'imprimante
+                  thermique du restaurant (Epson/Star réseau) ou imprime via le navigateur sur
+                  n'importe quelle imprimante.
                 </p>
                 <button className="z-btn z-btn-primary" style={{ width: '100%' }} onClick={() => setSettingsOpen(false)}>Terminé</button>
               </motion.div>
@@ -319,10 +318,9 @@ export default function Kitchen({ onLogout }) {
             <div className="pds-tk-brand">LES PIZZAS DU SOLEIL</div>
             <div className="pds-tk-sub">7 avenue François Mitterrand · Saint-Gaudens<br/>07 46 05 30 87</div>
             <div className="pds-tk-rule" />
-            <div className="pds-tk-line"><b>{ticket.code}</b><span>{timeStr(ticket.createdAt)}</span></div>
+            <div className="pds-tk-line"><b>{ticket.ref || ticket.code}</b><span>{timeStr(ticket.createdAt)}</span></div>
             <div className="pds-tk-line"><span>{ticket.modeLabel}</span><b>{ticket.asap ? 'DÈS QUE POSSIBLE' : `POUR ${ticket.slot}`}</b></div>
             {ticket.name && <div className="pds-tk-sm">{ticket.name} · {ticket.phone}</div>}
-            {ticket.address && <div className="pds-tk-sm">{ticket.address}</div>}
             <div className="pds-tk-rule" />
             {ticket.items.map((it, i) => (
               <div className="pds-tk-item" key={i}>

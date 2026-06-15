@@ -83,6 +83,13 @@ button {
   padding: 0;
 }
 
+/* Accessibilite clavier : focus visible (souris = pas d'outline grace a :focus-visible). */
+:focus-visible {
+  outline: 2px solid var(--z-red);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
 .z-container {
   width: 100%;
   max-width: 1280px;

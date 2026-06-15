@@ -113,50 +113,21 @@ export default function Order() {
     firstName: '',
     lastName: '',
     phone: '',
-    line: '',
     note: '',
   });
-  const [addressResults, setAddressResults] = useState([]);
-  const [selectedAddress, setSelectedAddress] = useState(null);
-  const [addressLoading, setAddressLoading] = useState(false);
   const [selectedSlot, setSelectedSlot] = useState(null);
-  const [orderCode, setOrderCode] = useState(null);
+  const [orderCode, setOrderCode] = useState(null); // identifiant interne non devinable (suivi de la commande)
+  const [orderRef, setOrderRef] = useState(null);    // reference courte lisible affichee au client
   const [mode, setMode] = useState('place'); // 'place' | 'emporter'
   const payment = 'place'; // paiement sur place uniquement (pas de paiement en ligne)
   const [liveStatus, setLiveStatus] = useState('recue'); // suivi temps réel côté client
   const [loyalty, setLoyalty] = useState(null); // carte de fidélité (aperçu puis crédit à la récupération)
   const stamped = useRef(false); // évite de créditer le tampon deux fois
   const [consent, setConsent] = useState(false); // consentement RGPD avant validation
+  const [submitting, setSubmitting] = useState(false); // anti double-clic + attente de l'ecriture
+  const [orderError, setOrderError] = useState(''); // message si l'envoi de la commande echoue
   const slots = generateSlots();
-  const deliveryFee = mode === 'livraison' ? 2.5 : 0;
-  const isDelivery = mode === 'livraison';
-  const modeLabel = mode === 'place' ? 'Sur place' : mode === 'emporter' ? 'À emporter' : 'Livraison';
-
-  /* Autocomplete via l'API Adresse Data.gouv.fr — gratuite, sans clé, française */
-  useEffect(() => {
-    if (address.line.length < 4) {
-      setAddressResults([]);
-      return;
-    }
-    const ctl = new AbortController();
-    setAddressLoading(true);
-    const t = setTimeout(() => {
-      fetch(
-        `https://api-adresse.data.gouv.fr/search/?q=${encodeURIComponent(address.line)}&limit=5&lat=43.1095&lon=0.7250`,
-        { signal: ctl.signal }
-      )
-        .then((r) => r.json())
-        .then((data) => {
-          setAddressResults(data.features || []);
-          setAddressLoading(false);
-        })
-        .catch(() => setAddressLoading(false));
-    }, 250);
-    return () => {
-      clearTimeout(t);
-      ctl.abort();
-    };
-  }, [address.line]);
+  const modeLabel = mode === 'place' ? 'Sur place' : 'À emporter';
 
   // À chaque changement d'étape, on garde l'utilisateur en haut du module commande
   // (évite le "saut" vers les sections suivantes quand la hauteur du bloc change)
@@ -191,63 +162,84 @@ export default function Order() {
         chime();
         try {
           if ('Notification' in window && Notification.permission === 'granted')
-            new Notification('Les Pizzas du Soleil', { body: `Votre commande ${orderCode} est prête !` });
+            new Notification('Les Pizzas du Soleil', { body: `Votre commande ${orderRef || orderCode} est prête !` });
         } catch (e) {}
       }
       prev = o.status;
     };
     return subscribeOrder(orderCode, apply);
-  }, [step, orderCode]);
+  }, [step, orderCode, orderRef]);
 
   const canGoToAddress = items.length > 0;
   const canGoToTime =
     address.firstName.trim().length > 1 &&
-    address.phone.replace(/\s/g, '').length >= 10 &&
-    (!isDelivery || selectedAddress !== null);
+    address.phone.replace(/\s/g, '').length >= 10;
   const canGoToPayment = selectedSlot !== null;
 
-  const handlePay = () => {
-    // Pas de paiement en ligne : on confirme la commande, reglement sur place.
-    const code = 'PDS-' + Math.floor(1000 + Math.random() * 9000);
-    placeOrder({
-      code,
-      status: 'recue',
-      mode,
-      modeLabel,
-      payment,
-      name: `${address.firstName} ${address.lastName}`.trim(),
-      phone: address.phone,
-      address: isDelivery && selectedAddress ? selectedAddress.label : null,
-      note: address.note,
-      slot: slotText(selectedSlot),
-      slotTime: selectedSlot ? selectedSlot.timeMs : Date.now(),
-      asap: selectedSlot ? Boolean(selectedSlot.asap) : false,
-      items: items.map((it) => ({
-        name: it.name, qty: it.qty || 1, price: it.price, size: it.size || null,
-        removed: it.removed || [], extras: it.extras || [],
-      })),
-      total: total + deliveryFee,
-      createdAt: Date.now(),
-    });
+  const handlePay = async () => {
+    if (submitting) return; // anti double-clic
+    // Reference courte lisible affichee au client + identifiant interne non devinable
+    // utilise comme cle du document : empeche d'enumerer/lire les commandes d'autrui.
+    const ref = 'PDS-' + Math.floor(1000 + Math.random() * 9000);
+    const rand = (window.crypto?.randomUUID?.() || (Math.random().toString(36) + Math.random().toString(36)))
+      .replace(/[^a-z0-9]/g, '').slice(0, 16);
+    const code = `${ref}-${rand}`;
+    setSubmitting(true);
+    setOrderError('');
+    try {
+      await placeOrder({
+        code,
+        ref,
+        status: 'recue',
+        mode,
+        modeLabel,
+        payment,
+        name: `${address.firstName} ${address.lastName}`.trim(),
+        phone: address.phone,
+        note: address.note,
+        slot: slotText(selectedSlot),
+        slotTime: selectedSlot ? selectedSlot.timeMs : Date.now(),
+        asap: selectedSlot ? Boolean(selectedSlot.asap) : false,
+        items: items.map((it) => ({
+          name: it.name, qty: it.qty || 1, price: it.price, size: it.size || null,
+          removed: it.removed || [], extras: it.extras || [],
+        })),
+        total,
+        // Tracabilite du consentement RGPD (recueilli via la case a cocher).
+        rgpdConsent: true,
+        rgpdConsentDate: new Date().toISOString(),
+        rgpdConsentVersion: '2026-06-15',
+        createdAt: Date.now(),
+      });
+    } catch (e) {
+      // Echec d'ecriture (reseau, regles, etc.) : on NE montre PAS l'ecran de succes.
+      setSubmitting(false);
+      setOrderError("Votre commande n'a pas pu être envoyée. Vérifiez votre connexion et réessayez, ou appelez le restaurant au 07 46 05 30 87.");
+      return;
+    }
     // Apercu de la carte de fidelite SANS ajouter de tampon : le tampon n'est
     // credite qu'a la recuperation (statut "prete"), pas a la commande, pour ne
     // pas recompenser une commande qui serait refusee ou annulee.
     stamped.current = false;
     setLoyalty({ ...getCard(address.phone), pending: true });
     setOrderCode(code);
+    setOrderRef(ref);
+    setSubmitting(false);
     setStep('success');
   };
 
   const handleReset = () => {
     clear();
     setStep('cart');
-    setAddress({ firstName: '', lastName: '', phone: '', line: '', note: '' });
-    setSelectedAddress(null);
+    setAddress({ firstName: '', lastName: '', phone: '', note: '' });
     setSelectedSlot(null);
     setOrderCode(null);
+    setOrderRef(null);
     setLoyalty(null);
     stamped.current = false;
     setConsent(false);
+    setSubmitting(false);
+    setOrderError('');
   };
 
   return (
@@ -425,15 +417,9 @@ export default function Order() {
                         <span>Sous-total ({count} article{count > 1 ? 's' : ''})</span>
                         <span>{fmt(total)}</span>
                       </div>
-                      {isDelivery && (
-                        <div className="z-cart-row">
-                          <span>Livraison</span>
-                          <span>{fmt(deliveryFee)}</span>
-                        </div>
-                      )}
                       <div className="z-cart-row z-cart-total">
                         <span>Total</span>
-                        <span>{fmt(total + deliveryFee)}</span>
+                        <span>{fmt(total)}</span>
                       </div>
                     </div>
 
@@ -462,7 +448,7 @@ export default function Order() {
                 transition={{ duration: 0.3 }}
                 className="z-step"
               >
-                <h3 className="z-step-title">{isDelivery ? 'Où on vous livre ?' : 'Vos coordonnées'}</h3>
+                <h3 className="z-step-title">Vos coordonnées</h3>
 
                 <div className="z-form-grid">
                   <label className="z-field">
@@ -503,72 +489,6 @@ export default function Order() {
                     autoComplete="tel"
                   />
                 </label>
-
-                {isDelivery && (
-                <label className="z-field z-field-address">
-                  <span>
-                    Adresse de livraison
-                    {addressLoading && <em className="z-field-loading">recherche...</em>}
-                  </span>
-                  <input
-                    type="text"
-                    value={address.line}
-                    onChange={(e) => {
-                      setAddress({ ...address, line: e.target.value });
-                      setSelectedAddress(null);
-                    }}
-                    placeholder="Tapez votre rue (ex : 5 rue Thiers, Saint-Gaudens)"
-                    autoComplete="off"
-                  />
-                  {addressResults.length > 0 && !selectedAddress && (
-                    <ul className="z-autocomplete">
-                      {addressResults.map((f) => (
-                        <li key={f.properties.id}>
-                          <button
-                            type="button"
-                            onClick={() => {
-                              setSelectedAddress({
-                                label: f.properties.label,
-                                city: f.properties.city,
-                                postcode: f.properties.postcode,
-                                lat: f.geometry.coordinates[1],
-                                lng: f.geometry.coordinates[0],
-                              });
-                              setAddress({ ...address, line: f.properties.label });
-                              setAddressResults([]);
-                            }}
-                          >
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-                              <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
-                              <circle cx="12" cy="10" r="3" />
-                            </svg>
-                            <div>
-                              <strong>{f.properties.name}</strong>
-                              <span>
-                                {f.properties.postcode} {f.properties.city}
-                              </span>
-                            </div>
-                          </button>
-                        </li>
-                      ))}
-                    </ul>
-                  )}
-                  {selectedAddress && (
-                    <div className="z-address-confirmed">
-                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
-                        <path d="M20 6L9 17l-5-5" />
-                      </svg>
-                      <div>
-                        <strong>{selectedAddress.label}</strong>
-                        <small>
-                          GPS prêt pour la navigation chauffeur : {selectedAddress.lat.toFixed(4)},{' '}
-                          {selectedAddress.lng.toFixed(4)}
-                        </small>
-                      </div>
-                    </div>
-                  )}
-                </label>
-                )}
 
                 <label className="z-field">
                   <span>Instructions (facultatif)</span>
@@ -611,7 +531,7 @@ export default function Order() {
                 className="z-step"
               >
                 <h3 className="z-step-title">
-                  {isDelivery ? 'À quelle heure on vous livre ?' : mode === 'emporter' ? 'À quelle heure vous récupérez ?' : 'Pour quelle heure ?'}
+                  {mode === 'emporter' ? 'À quelle heure vous récupérez ?' : 'Pour quelle heure ?'}
                 </h3>
                 <p className="z-step-hint">
                   Notre cuisine fonctionne en continu. Choisissez l'horaire qui
@@ -667,7 +587,6 @@ export default function Order() {
                     <span className="z-recap-label">{modeLabel}</span>
                     <span className="z-recap-value">
                       {address.firstName} {address.lastName}
-                      {isDelivery && selectedAddress ? ` · ${selectedAddress.label}` : ''}
                     </span>
                   </div>
                   <div className="z-recap-row">
@@ -685,16 +604,10 @@ export default function Order() {
                     <span className="z-recap-label">Sous-total</span>
                     <span className="z-recap-value">{fmt(total)}</span>
                   </div>
-                  {isDelivery && (
-                    <div className="z-recap-row">
-                      <span className="z-recap-label">Livraison</span>
-                      <span className="z-recap-value">{fmt(deliveryFee)}</span>
-                    </div>
-                  )}
                   <div className="z-recap-row z-recap-total">
                     <span className="z-recap-label">Total</span>
                     <span className="z-recap-value">
-                      {fmt(total + deliveryFee)}
+                      {fmt(total)}
                     </span>
                   </div>
                 </div>
@@ -717,19 +630,26 @@ export default function Order() {
                     commande, conformément à la{' '}
                     <button type="button" className="z-consent-link" onClick={() => openLegal('confidentialite')}>
                       politique de confidentialité
+                    </button>, et je reconnais avoir pris connaissance des{' '}
+                    <button type="button" className="z-consent-link" onClick={() => openLegal('cgv')}>
+                      conditions générales de vente
                     </button>.
                   </span>
                 </label>
 
+                {orderError && <div className="z-order-error">{orderError}</div>}
+
                 <div className="z-step-actions">
-                  <button className="z-btn-ghost-dark" onClick={() => setStep('time')}>
+                  <button className="z-btn-ghost-dark" onClick={() => setStep('time')} disabled={submitting}>
                     Retour
                   </button>
-                  <button className="z-btn z-btn-primary z-btn-pay" onClick={handlePay} disabled={!consent}>
-                    Confirmer la commande · {fmt(total + deliveryFee)}
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
-                      <path d="M5 12l5 5L20 7" />
-                    </svg>
+                  <button className="z-btn z-btn-primary z-btn-pay" onClick={handlePay} disabled={!consent || submitting}>
+                    {submitting ? 'Envoi en cours…' : <>Confirmer la commande · {fmt(total)}</>}
+                    {!submitting && (
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+                        <path d="M5 12l5 5L20 7" />
+                      </svg>
+                    )}
                   </button>
                 </div>
               </motion.div>
@@ -758,7 +678,7 @@ export default function Order() {
 
                 <h3 className="z-success-title">Commande confirmée&nbsp;!</h3>
                 <p className="z-success-sub">
-                  Merci {address.firstName}. Votre commande <strong>{orderCode}</strong>{' '}
+                  Merci {address.firstName}. Votre commande <strong>{orderRef || orderCode}</strong>{' '}
                   {selectedSlot?.asap ? 'est en préparation.' : <>est programmée pour <strong>{slotText(selectedSlot)}</strong>.</>}{' '}
                   {mode === 'emporter'
                     ? <>À récupérer {selectedSlot?.asap ? 'dès qu\'elle est prête' : `vers ${slotText(selectedSlot)}`} au 7 avenue François Mitterrand.</>
@@ -772,7 +692,7 @@ export default function Order() {
                   </div>
                   <div>
                     <span>Paiement</span>
-                    <strong>Sur place · {fmt(total + deliveryFee)}</strong>
+                    <strong>Sur place · {fmt(total)}</strong>
                   </div>
                 </div>
 
@@ -844,7 +764,7 @@ export default function Order() {
                     Laissez-nous un avis
                   </a>
                   <button className="z-btn-ghost-dark" onClick={handleReset}>
-                    Refaire un test
+                    Nouvelle commande
                   </button>
                 </div>
               </motion.div>
@@ -1378,6 +1298,11 @@ export default function Order() {
         }
         .z-consent input { width: 18px; height: 18px; margin-top: 1px; accent-color: var(--z-green); flex-shrink: 0; }
         .z-consent-link { color: var(--z-red); font-weight: 600; text-decoration: underline; background: none; border: none; padding: 0; font: inherit; cursor: pointer; }
+        .z-order-error {
+          margin: 14px 0 0; padding: 12px 14px; border-radius: 12px;
+          background: rgba(220,38,38,.08); border: 1px solid rgba(220,38,38,.3);
+          color: var(--z-danger); font-size: .86rem; font-weight: 600; line-height: 1.45;
+        }
         .z-mode {
           display: grid;
           grid-template-columns: repeat(2, 1fr);

@@ -8,7 +8,7 @@
  *    compte) cree sa commande et suit UNIQUEMENT la sienne (lecture d'un seul
  *    document par son code). Les regles Firestore appliquent ce cloisonnement.
  *  - LOCAL (localStorage + events) sinon : dev sans projet Firebase, login cuisine
- *    cosmetique (soleil / cuisine31).
+ *    cosmetique (identifiant "soleil", n'importe quel mot de passe non vide).
  */
 
 import { initializeApp } from 'firebase/app';
@@ -64,8 +64,8 @@ if (CLOUD) {
 // ---------------------------------------------------------------------------
 export async function signInKitchen(id, password, remember = true) {
   if (!CLOUD) {
-    // mode local : gate cosmetique
-    if (id.trim().toLowerCase() === 'soleil' && password === 'cuisine31') return true;
+    // mode local (dev sans Firebase) : gate cosmetique, aucun mot de passe reel en dur
+    if (id.trim().toLowerCase() === 'soleil' && password.length > 0) return true;
     const e = new Error('bad creds'); e.code = 'auth/invalid-credential'; throw e;
   }
   await setPersistence(auth, remember ? browserLocalPersistence : browserSessionPersistence);

@@ -24,10 +24,10 @@ export default function Footer() {
           <div className="z-footer-col">
             <h4>Notre carte</h4>
             <ul>
-              <li><a href="#menu">Pizzas Viandes</a></li>
-              <li><a href="#menu">Pizzas Fromages &amp; Légumes</a></li>
-              <li><a href="#menu">Pizzas Poissons</a></li>
-              <li><a href="#menu">Desserts maison</a></li>
+              <li><a href="#menu">Pizzas &amp; plaques</a></li>
+              <li><a href="#menu">Salades</a></li>
+              <li><a href="#menu">Menus</a></li>
+              <li><a href="#menu">Boissons &amp; desserts</a></li>
             </ul>
           </div>
 

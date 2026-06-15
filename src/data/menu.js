@@ -1,17 +1,15 @@
-/* Carte reelle Les Pizzas du Soleil — saisie depuis le menu PDF fourni par Marie (14/06/2026).
- * 3 tailles par pizza : 26 cm / 33 cm / 40 cm, avec un prix fixe par taille.
- * Retouches verbales de Marie (14/06, a affiner au RDV) :
- *   - "Viando" renommee "Reine"
- *   - "Pita" renommee "Pilita" (poissons)
- *   - ajout d'une pizza "Rougail Saucisse" (compo + prix a confirmer)
+/* Carte Les Pizzas du Soleil — v2 (RDV 14/06/2026, decisions appliquees le 15/06).
+ * 3 tailles par pizza : 25 cm / 33 cm / 40 cm, prix fixe par taille.
+ * Familles non-pizza (calzone garde le customizer ; salades / menus / a la piece /
+ * plaques / boissons / desserts = items a prix unique, non personnalisables).
  */
 
 const pi = (s) => `/images/pizzas/${s}`;
 const ai = (s) => `/images/ambiance/${s}`;
 
-/* Construit les 3 tailles d'une pizza a partir des 3 prix (26 / 33 / 40 cm). */
-const sz = (p26, p33, p40) => [
-  { id: '26', label: '26 cm', sub: 'Individuelle', price: p26 },
+/* Construit les 3 tailles d'une pizza a partir des 3 prix (25 / 33 / 40 cm). */
+const sz = (p25, p33, p40) => [
+  { id: '25', label: '25 cm', sub: 'Individuelle', price: p25 },
   { id: '33', label: '33 cm', sub: 'Moyenne', price: p33 },
   { id: '40', label: '40 cm', sub: 'Familiale', price: p40 },
 ];
@@ -92,8 +90,8 @@ export const CARTE = [
       { name: 'Forestière', desc: "Tomate, emmental, champignons, lardons, pomme de terre, olive.", price: 7, sizes: sz(7, 13, 16), img: pi('tartufo.jpg') },
       { name: 'Spéciale', desc: "Tomate, emmental, jambon, chorizo, merguez, lardons, poivron.", price: 7, sizes: sz(7, 13, 16) },
       { name: 'P. Saucisse', desc: "Tomate, emmental, saucisse épicée.", price: 7, sizes: sz(7, 13, 16) },
-      // Ajout demande par Marie le 14/06 — composition et prix a confirmer au RDV.
       { name: 'Rougail Saucisse', desc: "Tomate, emmental, saucisse, sauce rougail, oignon, gros piment.", price: 7.5, sizes: sz(7.5, 13.5, 16.5) },
+      { name: 'Calzone', desc: "Pizza pliée : jambon, champignons, œuf, oignon, emmental.", price: 9, sizes: sz(9, 12.5, 15.5) },
     ],
   },
   {
@@ -119,12 +117,77 @@ export const CARTE = [
     ],
   },
   {
-    // Hors PDF — desserts a confirmer avec Marie au RDV.
+    cat: 'Plaques pizzas (40 x 60 cm)',
+    items: [
+      { name: 'Plaque classique', desc: "Grande plaque 40 x 60 cm, garnitures classiques.", price: 26.5 },
+      { name: 'Plaque viandes', desc: "Grande plaque 40 x 60 cm, garnitures viandes.", price: 28.5 },
+      { name: 'Plaque fromage', desc: "Grande plaque 40 x 60 cm, garnitures fromages.", price: 31 },
+      { name: 'Plaque poisson', desc: "Grande plaque 40 x 60 cm, garnitures poisson.", price: 32.5 },
+    ],
+  },
+  {
+    cat: 'Salades',
+    items: [
+      { name: 'Salade du soleil', desc: "Achard de légumes, salade verte, 4 bouchons, olives noires.", price: 11 },
+      { name: 'Salade océane', desc: "Salade verte, saumon, citron, olives noires.", price: 11.5 },
+      { name: 'Salade du pêcheur', desc: "Salade verte, thon, citron, olives noires.", price: 11 },
+      { name: 'Salade de la reine', desc: "Salade verte, billes de mozzarella, jambon, tenders, olives noires, oignons frits.", price: 11 },
+    ],
+  },
+  {
+    cat: 'Menus',
+    items: [
+      { name: 'Menu enfant (tenders)', desc: "4 tenders, frites, Capri-Sun.", price: 6 },
+      { name: 'Menu enfant (nuggets)', desc: "5 nuggets, frites, Capri-Sun.", price: 5.5 },
+      { name: 'Menu étudiant', desc: "Pizza 25 cm + canette 33 cl.", price: 7 },
+      { name: 'Menu soleil', desc: "Pizza 25 cm + canette 33 cl + dessert.", price: 10 },
+      { name: 'Menu soleil (salade)', desc: "Salade + pizza + canette 33 cl.", price: 8 },
+      { name: 'Menu wings', desc: "5 wings + canette 33 cl + frites.", price: 7.5 },
+      { name: 'Menu wings XL', desc: "10 wings + canette 33 cl + frites.", price: 14 },
+      { name: 'Menu famille', desc: "12 wings + 6 tenders + boisson 1,5 L + 4 portions de frites.", price: 23 },
+    ],
+  },
+  {
+    cat: 'À la pièce',
+    items: [
+      { name: 'Tenders (5 pièces)', desc: "5 tenders de poulet.", price: 6 },
+      { name: 'Wings (5 pièces)', desc: "5 wings de poulet.", price: 5 },
+      { name: 'Portion de frites', desc: "Une portion de frites maison.", price: 2.5 },
+    ],
+  },
+  {
+    cat: 'Boissons',
+    items: [
+      { name: 'Coca-Cola', desc: "33 cl.", price: 2 },
+      { name: 'Coca-Cola Zéro', desc: "33 cl.", price: 2 },
+      { name: 'Coca-Cola Cherry', desc: "33 cl.", price: 2 },
+      { name: 'Fanta Orange', desc: "33 cl.", price: 2 },
+      { name: 'Fanta Dragon', desc: "33 cl.", price: 2 },
+      { name: 'Sprite', desc: "33 cl.", price: 2 },
+      { name: 'Orangina', desc: "33 cl.", price: 2 },
+      { name: 'Schweppes Agrumes', desc: "33 cl.", price: 2 },
+      { name: 'Oasis Tropical', desc: "33 cl.", price: 2 },
+      { name: 'Oasis Pomme Cassis', desc: "33 cl.", price: 2 },
+      { name: 'Ice Tea Pêche', desc: "33 cl.", price: 2 },
+      { name: 'Soda 1,5 L', desc: "Bouteille 1,5 L.", price: 4.5 },
+      { name: 'Eau', desc: "33 cl.", price: 2 },
+    ],
+  },
+  {
+    cat: 'Bières & vins (sous licence)',
+    items: [
+      { name: 'Desperados', desc: "Bière, bouteille.", price: 4 },
+      { name: 'Heineken', desc: "Bière, bouteille.", price: 4 },
+      { name: 'Vin', desc: "Bouteille 75 cl.", price: 9 },
+    ],
+  },
+  {
     cat: 'Desserts maison',
     items: [
-      { name: 'Tiramisu', desc: "Tiramisu maison : biscuits, crème mascarpone, cacao.", price: 5 },
-      { name: 'Cookie maison', desc: "Cookie aux pépites de chocolat, sorti du four.", price: 4, img: pi('cookie-pistache.jpg') },
-      { name: 'Nutella maison', desc: "Pizza dessert : pâte maison, Nutella, sucre glacé.", price: 5 },
+      { name: 'Tiramisu', desc: "Tiramisu maison : biscuits, crème mascarpone, cacao.", price: 4 },
+      { name: 'Glace artisanale', desc: "Glace artisanale en petit pot.", price: 4 },
+      { name: 'Moelleux chocolat', desc: "Moelleux au chocolat.", price: 4 },
+      { name: 'Tarte coco', desc: "Tarte à la noix de coco.", price: 4 },
     ],
   },
 ];

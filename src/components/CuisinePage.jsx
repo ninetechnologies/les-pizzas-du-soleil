@@ -3,10 +3,7 @@ import { motion } from 'motion/react';
 import Kitchen from './Kitchen.jsx';
 import Logo from './Logo.jsx';
 import { primeAudio } from '../lib/sound.js';
-
-/* Identifiants demo (en prod : comptes Firebase Auth par restaurant). */
-const CREDS = { id: 'soleil', mdp: 'cuisine31' };
-const KEY = 'pds_kds_auth';
+import { signInKitchen, onKitchenAuth, signOutKitchen } from '../lib/orders.js';
 
 export default function CuisinePage() {
   const [authed, setAuthed] = useState(false);
@@ -14,27 +11,30 @@ export default function CuisinePage() {
   const [mdp, setMdp] = useState('');
   const [remember, setRemember] = useState(true);
   const [err, setErr] = useState('');
+  const [busy, setBusy] = useState(false);
 
-  // Connexion auto si une session a ete memorisee
+  // Restaure la session cuisine (Firebase Auth persiste la connexion).
   useEffect(() => {
-    if (localStorage.getItem(KEY) || sessionStorage.getItem(KEY)) setAuthed(true);
+    return onKitchenAuth((ok) => { if (ok) setAuthed(true); });
   }, []);
 
-  const submit = (e) => {
+  const submit = async (e) => {
     e.preventDefault();
-    if (id.trim().toLowerCase() === CREDS.id && mdp === CREDS.mdp) {
+    setBusy(true);
+    try {
+      await signInKitchen(id, mdp, remember);
       primeAudio(); // debloque le son dans le geste de connexion (mobile)
-      (remember ? localStorage : sessionStorage).setItem(KEY, '1');
       setErr('');
       setAuthed(true);
-    } else {
+    } catch (err) {
       setErr('Identifiant ou mot de passe incorrect.');
+    } finally {
+      setBusy(false);
     }
   };
 
   const logout = () => {
-    localStorage.removeItem(KEY);
-    sessionStorage.removeItem(KEY);
+    signOutKitchen();
     setId(''); setMdp(''); setAuthed(false);
   };
 
@@ -69,7 +69,7 @@ export default function CuisinePage() {
 
         {err && <div className="z-login-err">{err}</div>}
 
-        <button type="submit" className="z-btn z-btn-primary z-login-btn">Se connecter</button>
+        <button type="submit" className="z-btn z-btn-primary z-login-btn" disabled={busy}>{busy ? 'Connexion…' : 'Se connecter'}</button>
 
         <p className="z-login-hint">Démo · identifiant&nbsp;: <b>soleil</b> · mot de passe&nbsp;: <b>cuisine31</b></p>
       </motion.form>

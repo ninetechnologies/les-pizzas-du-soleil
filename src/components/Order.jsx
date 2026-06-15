@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { useCart } from '../hooks/useCart.jsx';
-import { placeOrder, subscribe, getOrders } from '../lib/orders.js';
+import { placeOrder, subscribeOrder } from '../lib/orders.js';
 import { addStamp, getCard, GOAL } from '../lib/loyalty.js';
 import { openLegal } from './Legal.jsx';
 
@@ -178,8 +178,8 @@ export default function Order() {
       try { Notification.requestPermission(); } catch (e) {}
     }
     let prev = 'recue';
-    const apply = (list) => {
-      const o = list.find((x) => x.code === orderCode);
+    // Lecture d'UN seul document (la commande du client), pas de toute la liste.
+    const apply = (o) => {
       if (!o) return;
       setLiveStatus(o.status);
       // Tampon de fidelite credite seulement quand la commande est honoree.
@@ -196,8 +196,7 @@ export default function Order() {
       }
       prev = o.status;
     };
-    apply(getOrders());
-    return subscribe(apply);
+    return subscribeOrder(orderCode, apply);
   }, [step, orderCode]);
 
   const canGoToAddress = items.length > 0;

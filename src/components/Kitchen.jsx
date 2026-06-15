@@ -42,22 +42,21 @@ export default function Kitchen({ onLogout }) {
   const [soundOn, setSoundOn] = useState(() => audioReady());
   const [, setTick] = useState(0); // force le regroupement (promotion programmee -> a faire)
   const announced = useRef(new Set()); // commandes deja signalees par l'alarme
+  const mountAt = useRef(Date.now());  // pour ne pas sonner les commandes deja la a l'ouverture
 
   const flashOn = (ms) => { setFlash(true); setTimeout(() => setFlash(false), ms); };
 
   useEffect(() => {
-    const initial = getOrders();
-    setOrders(initial);
-    // au chargement, ne pas (re)sonner pour les commandes deja la
-    initial.forEach((o) => announced.current.add(o.code));
+    setOrders(getOrders());
     const unsub = subscribe((list) => {
       setOrders(list);
-      // alarme uniquement pour une nouvelle commande IMMINENTE (pas les programmees lointaines)
+      // Alarme seulement pour une nouvelle commande IMMINENTE arrivee APRES l'ouverture
+      // de l'ecran (les commandes deja presentes au chargement ne sonnent pas).
       let nouvelle = false;
       list.forEach((o) => {
         if (o.status === 'recue' && isSoon(o) && !announced.current.has(o.code)) {
           announced.current.add(o.code);
-          nouvelle = true;
+          if ((o.createdAt || 0) >= mountAt.current - 5000) nouvelle = true;
         }
       });
       if (nouvelle) {

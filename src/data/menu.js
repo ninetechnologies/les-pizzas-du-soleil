@@ -33,7 +33,7 @@ export const FEATURED = [
     desc: "Tomate, emmental, jambon, olive.",
     price: 6.5,
     sizes: sz(6.5, 12.5, 15),
-    image: pi('regina.jpg'),
+    image: pi('jambon-champignons.jpg'),
     popular: true,
   },
   {
@@ -42,7 +42,7 @@ export const FEATURED = [
     desc: "Tomate, emmental, poivron, merguez, olive.",
     price: 6.5,
     sizes: sz(6.5, 12.5, 15),
-    image: pi('orientale-merguez.jpg'),
+    image: pi('merguez-poivrons.jpg'),
     popular: true,
   },
   {
@@ -51,7 +51,7 @@ export const FEATURED = [
     desc: "Tomate, emmental, saumon, citron, crème fraîche.",
     price: 8,
     sizes: sz(8, 13, 15),
-    image: pi('norvegienne-saumon.jpg'),
+    image: pi('saumon-aneth.jpg'),
     signature: true,
   },
   {
@@ -76,14 +76,14 @@ export const CARTE = [
   {
     cat: 'Pizzas Viandes',
     items: [
-      { name: 'Reine', desc: "Tomate, emmental, jambon, olive.", price: 6.5, sizes: sz(6.5, 12.5, 15), img: pi('regina.jpg') },
-      { name: 'Roma', desc: "Tomate, emmental, jambon, merguez, œuf, olive.", price: 7.5, sizes: sz(7.5, 13, 16) },
+      { name: 'Reine', desc: "Tomate, emmental, jambon, olive.", price: 6.5, sizes: sz(6.5, 12.5, 15), img: pi('jambon-champignons.jpg') },
+      { name: 'Roma', desc: "Tomate, emmental, jambon, merguez, œuf, olive.", price: 7.5, sizes: sz(7.5, 13, 16), img: pi('jambon-oeuf.jpg') },
       { name: 'Hawaïenne', desc: "Tomate, emmental, poulet, ananas, olive.", price: 7, sizes: sz(7, 13, 16) },
       { name: 'Pépéronna', desc: "Tomate, mozzarella, chorizo, olive.", price: 7, sizes: sz(7, 13, 16), img: pi('piccante.jpg') },
       { name: 'Campagnarde', desc: "Tomate, emmental, lardon, chèvre, olive.", price: 6.5, sizes: sz(6.5, 12.5, 15) },
       { name: 'Alsacienne', desc: "Crème fraîche, emmental, pomme de terre, oignons, lardons, olive.", price: 6.5, sizes: sz(6.5, 12.5, 15), img: pi('carbonara.jpg') },
       { name: 'Casa Blanca', desc: "Crème fraîche, champignons, lardons, chèvre, miel, mozzarella.", price: 7, sizes: sz(7, 13, 16), img: pi('cremosa.jpg') },
-      { name: 'Orientale', desc: "Tomate, emmental, poivron, merguez, olive.", price: 6.5, sizes: sz(6.5, 12.5, 15), img: pi('orientale-merguez.jpg') },
+      { name: 'Orientale', desc: "Tomate, emmental, poivron, merguez, olive.", price: 6.5, sizes: sz(6.5, 12.5, 15), img: pi('merguez-poivrons.jpg') },
       { name: 'Chicken', desc: "Tomate, emmental, poivron, poulet, crème fraîche, olive.", price: 7, sizes: sz(7, 13, 16) },
       { name: 'Créole', desc: "Tomate, emmental, saucisse fumée, oignon, gros piment, olive.", price: 7.5, sizes: sz(7.5, 13.5, 16.5) },
       { name: 'Le Soleil', desc: "Tomate, emmental, bouchons, oignon, gros piment, olive.", price: 7.5, sizes: sz(7.5, 13.5, 16.5), img: pi('hero-mozza.jpg') },
@@ -97,7 +97,7 @@ export const CARTE = [
   {
     cat: 'Pizzas Fromages & Légumes',
     items: [
-      { name: 'Margherita', desc: "Tomate, emmental, olive.", price: 7, sizes: sz(7, 10, 13), img: pi('margherita.jpg') },
+      { name: 'Margherita', desc: "Tomate, emmental, olive.", price: 7, sizes: sz(7, 10, 13), img: pi('fromage-olives.jpg') },
       { name: 'Chèvre-Miel', desc: "Tomate, emmental, chèvre, miel, olive.", price: 8.5, sizes: sz(8.5, 13, 15), img: pi('chevre-miel.jpg') },
       { name: '4 Fromages', desc: "Tomate, emmental, roquefort, chèvre, raclette, oignon, crème fraîche.", price: 8.5, sizes: sz(8.5, 13, 15), img: pi('4-fromages.jpg') },
       { name: 'Végétarienne', desc: "Tomate, emmental, champignons, poivrons verts, oignon, œuf, persillade.", price: 7, sizes: sz(7, 13, 15) },
@@ -112,7 +112,7 @@ export const CARTE = [
       { name: 'Pilita', desc: "Tomate, emmental, rillettes de sardines au citron, crème fraîche.", price: 8.5, sizes: sz(8.5, 14.5, 16.5) },
       { name: 'Sardine', desc: "Tomate, emmental, salade de sardines, oignon, gros piment.", price: 7, sizes: sz(7, 10.5, 13) },
       { name: 'Océane', desc: "Tomate, emmental, saumon, crevettes, moules, citron, crème fraîche.", price: 8.5, sizes: sz(8.5, 14, 16.5) },
-      { name: 'Norvégienne', desc: "Tomate, emmental, saumon, citron, crème fraîche.", price: 8, sizes: sz(8, 13, 15), img: pi('norvegienne-saumon.jpg') },
+      { name: 'Norvégienne', desc: "Tomate, emmental, saumon, citron, crème fraîche.", price: 8, sizes: sz(8, 13, 15), img: pi('saumon-aneth.jpg') },
       { name: 'Napolitaine', desc: "Tomate, emmental, anchois, olives.", price: 7, sizes: sz(7, 14, 15.5) },
     ],
   },

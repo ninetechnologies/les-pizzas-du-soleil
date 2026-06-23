@@ -3,6 +3,7 @@ import Lenis from 'lenis';
 import { CartProvider } from './hooks/useCart.jsx';
 import Navbar from './components/Navbar.jsx';
 import Hero from './components/Hero.jsx';
+import PromoBanner from './components/PromoBanner.jsx';
 import Menu from './components/Menu.jsx';
 import Order from './components/Order.jsx';
 import Reviews from './components/Reviews.jsx';
@@ -50,6 +51,7 @@ export default function App() {
       <Navbar />
       <main>
         <Hero />
+        <PromoBanner />
         <Menu />
         <Order />
         <Reviews />

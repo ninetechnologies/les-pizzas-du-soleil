@@ -324,6 +324,14 @@ export default function Order() {
                   ))}
                 </div>
 
+                <div className="z-promo-note" role="note">
+                  <span className="z-promo-note-icon" aria-hidden="true">★</span>
+                  <span>
+                    <strong>Offre d'ouverture</strong> — pour 2 pizzas 33 cm achetées, une pizza 25 cm
+                    et une grande boisson offertes. Avantage appliqué directement en caisse au paiement.
+                  </span>
+                </div>
+
                 {items.length === 0 ? (
                   <div className="z-empty">
                     <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
@@ -1333,6 +1341,35 @@ export default function Order() {
         }
         .z-btn-pay {
           min-width: 180px;
+        }
+
+        /* Rappel promo d'ouverture (informatif, pas de calcul auto) */
+        .z-promo-note {
+          display: flex;
+          align-items: flex-start;
+          gap: 12px;
+          margin-bottom: 22px;
+          padding: 14px 16px;
+          border-radius: 14px;
+          background: rgba(247, 168, 30, 0.12);
+          border: 1.5px solid rgba(247, 168, 30, 0.5);
+          font-size: 0.86rem;
+          line-height: 1.45;
+          color: var(--z-text);
+        }
+        .z-promo-note strong { color: var(--z-green-dark); font-weight: 700; }
+        .z-promo-note-icon {
+          flex-shrink: 0;
+          width: 26px;
+          height: 26px;
+          border-radius: 50%;
+          display: grid;
+          place-items: center;
+          background: var(--z-gold);
+          color: var(--z-black);
+          font-family: var(--z-font-display);
+          font-weight: 900;
+          font-size: 0.9rem;
         }
 
         /* Success */

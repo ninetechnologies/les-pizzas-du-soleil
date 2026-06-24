@@ -195,7 +195,7 @@ export default function Menu() {
         </div>
 
         <p className="z-menu-note">
-          Toutes nos viandes sont <strong>halal</strong>. Pizzas personnalisables :
+          Pizzas personnalisables :
           taille (25, 33 ou 40 cm) et suppléments au choix.
         </p>
       </div>

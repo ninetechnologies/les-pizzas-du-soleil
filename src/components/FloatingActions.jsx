@@ -20,7 +20,7 @@ export default function FloatingActions() {
     <AnimatePresence>
       {visible && (
         <motion.a
-          href="tel:+33746053087"
+          href="tel:+33531616347"
           className="z-fab-call"
           aria-label="Appeler Les Pizzas du Soleil"
           initial={{ scale: 0, opacity: 0 }}

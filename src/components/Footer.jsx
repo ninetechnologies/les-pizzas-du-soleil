@@ -37,7 +37,7 @@ export default function Footer() {
             <ul>
               <li><a href="#commander">En direct (sans commission)</a></li>
               <li><a href="#commander">Sur place &amp; à emporter</a></li>
-              <li><a href="tel:+33746053087">Saint-Gaudens · 07 46 05 30 87</a></li>
+              <li><a href="tel:+33531616347">Saint-Gaudens · 05 31 61 63 47</a></li>
             </ul>
           </div>
 
@@ -49,7 +49,7 @@ export default function Footer() {
                   <path d="M12 2L9.91 8.26 3 9.27l5 4.87L6.82 21 12 17.77 17.18 21 16 14.14l5-4.87-6.91-1.01L12 2z" />
                 </svg>
               </a>
-              <a href="tel:+33746053087" aria-label="Appeler Les Pizzas du Soleil">
+              <a href="tel:+33531616347" aria-label="Appeler Les Pizzas du Soleil">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.37 1.9.72 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.35 1.85.59 2.81.72A2 2 0 0 1 22 16.92z" />
                 </svg>

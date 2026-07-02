@@ -347,7 +347,7 @@ export default function Kitchen({ onLogout }) {
         {ticket && (
           <div className="pds-ticket-inner">
             <div className="pds-tk-brand">LES PIZZAS DU SOLEIL</div>
-            <div className="pds-tk-sub">7 avenue François Mitterrand · Saint-Gaudens<br/>07 46 05 30 87</div>
+            <div className="pds-tk-sub">7 avenue François Mitterrand · Saint-Gaudens<br/>05 31 61 63 47</div>
             <div className="pds-tk-rule" />
             <div className="pds-tk-line"><b>{ticket.ref || ticket.code}</b><span>{timeStr(ticket.createdAt)}</span></div>
             <div className="pds-tk-line"><span>{ticket.modeLabel}</span><b>{ticket.asap ? 'DÈS QUE POSSIBLE' : `POUR ${ticket.slot}`}</b></div>

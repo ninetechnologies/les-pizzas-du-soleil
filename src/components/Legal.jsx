@@ -7,7 +7,7 @@ export function openLegal(doc) {
 }
 
 /* TODO Marie : ajouter un email de contact de l'etablissement (RGPD) si dispo. */
-const TEL = '07 46 05 30 87'; // confirme par Marie le 15/06
+const TEL = '05 31 61 63 47'; // confirme par Marie le 15/06
 
 function Mentions() {
   return (

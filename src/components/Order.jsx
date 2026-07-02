@@ -214,7 +214,7 @@ export default function Order() {
     } catch (e) {
       // Echec d'ecriture (reseau, regles, etc.) : on NE montre PAS l'ecran de succes.
       setSubmitting(false);
-      setOrderError("Votre commande n'a pas pu être envoyée. Vérifiez votre connexion et réessayez, ou appelez le restaurant au 07 46 05 30 87.");
+      setOrderError("Votre commande n'a pas pu être envoyée. Vérifiez votre connexion et réessayez, ou appelez le restaurant au 05 31 61 63 47.");
       return;
     }
     // Apercu de la carte de fidelite SANS ajouter de tampon : le tampon n'est

@@ -2,6 +2,8 @@ import React, { useEffect, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { getOrders, subscribe, updateStatus, clearOrders } from '../lib/orders.js';
 import { primeAudio, playAlarm, audioReady } from '../lib/sound.js';
+import NewOrderModal from './NewOrderModal.jsx';
+import ServiceRecap from './ServiceRecap.jsx';
 
 const fmt = (n) => n.toFixed(2).replace('.', ',') + ' €';
 const STATUS = [
@@ -37,6 +39,8 @@ export default function Kitchen({ onLogout }) {
   const [orders, setOrders] = useState([]);
   const [printer, setPrinter] = useState({ connected: false, auto: false });
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const [newOrderOpen, setNewOrderOpen] = useState(false);
+  const [recapOpen, setRecapOpen] = useState(false);
   const [ticket, setTicket] = useState(null);
   const [flash, setFlash] = useState(false);
   const [soundOn, setSoundOn] = useState(() => audioReady());
@@ -128,6 +132,15 @@ export default function Kitchen({ onLogout }) {
   const doPrint = (order) => {
     setTicket(order);
     setTimeout(() => { window.print(); }, 120);
+  };
+
+  // Commande saisie a la cuisine (telephone/comptoir) : elle est deja connue du
+  // personnel, on la marque "annoncee" pour ne PAS declencher l'alarme, on ferme
+  // le module, et on imprime le bon de commande client si demande.
+  const handleManualCreated = (order, shouldPrint) => {
+    announced.current.add(order.code);
+    setNewOrderOpen(false);
+    if (shouldPrint) doPrint(order);
   };
 
   const CLOSED = ['terminee', 'refusee', 'annulee'];
@@ -222,6 +235,14 @@ export default function Kitchen({ onLogout }) {
             <em>{active.length} en cours</em>
           </div>
           <div className="z-kds-actions">
+            <button className="z-kds-new" onClick={() => setNewOrderOpen(true)} aria-label="Saisir une nouvelle commande">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+              Nouvelle commande
+            </button>
+            <button className="z-kds-ghost" onClick={() => setRecapOpen(true)} aria-label="Récapitulatif comptable du service">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 3v18h18"/><path d="M7 14l3-3 3 3 4-5"/></svg>
+              Récap
+            </button>
             <button className="z-kds-sound" data-on={soundOn} onClick={enableSound} title="Joue l'alarme pour tester le son (à faire une fois sur la tablette)" aria-label="Activer et tester le son des nouvelles commandes">
               {soundOn ? (
                 <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M15.5 8.5a5 5 0 0 1 0 7M19 5a9 9 0 0 1 0 14"/></svg>
@@ -311,6 +332,16 @@ export default function Kitchen({ onLogout }) {
         </AnimatePresence>
       </div>
 
+      {/* PAS d'AnimatePresence ici : son unmount depend de rAF, gele quand l'onglet
+          passe en arriere-plan (tablette qui change d'app) -> modale bloquee a l'ecran.
+          Rendu conditionnel direct = fermeture instantanee et fiable (cf. Order.jsx). */}
+      {newOrderOpen && (
+        <NewOrderModal onClose={() => setNewOrderOpen(false)} onCreated={handleManualCreated} />
+      )}
+      {recapOpen && (
+        <ServiceRecap orders={orders} onClose={() => setRecapOpen(false)} />
+      )}
+
       {/* Ticket imprimable (cache a l'ecran, visible a l'impression) */}
       <div id="pds-ticket" aria-hidden="true">
         {ticket && (
@@ -352,7 +383,10 @@ export default function Kitchen({ onLogout }) {
         .z-kds-title em { font-family: var(--z-font-body); font-style: normal; font-size: .8rem; font-weight: 600; color: var(--z-gold); background: rgba(247,168,30,.14); padding: 3px 10px; border-radius: 999px; }
         .z-kds-dot { width: 10px; height: 10px; border-radius: 50%; background: #3ad17a; box-shadow: 0 0 0 0 rgba(58,209,122,.5); animation: kpulse 2s infinite; }
         @keyframes kpulse { 0%{box-shadow:0 0 0 0 rgba(58,209,122,.5)} 70%{box-shadow:0 0 0 9px rgba(58,209,122,0)} 100%{box-shadow:0 0 0 0 rgba(58,209,122,0)} }
-        .z-kds-actions { display: flex; align-items: center; gap: 10px; }
+        .z-kds-actions { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; justify-content: flex-end; }
+        .z-kds-new { display: inline-flex; align-items: center; gap: 8px; padding: 9px 16px; border-radius: 10px; background: var(--z-red); color: #fff; font-weight: 700; font-size: .85rem; box-shadow: 0 6px 18px -6px rgba(214,40,40,.6); }
+        .z-kds-new:hover { background: var(--z-red-dark); }
+        .z-kds-new:active { transform: scale(.97); }
         .z-kds-sound { display: inline-flex; align-items: center; gap: 8px; padding: 9px 14px; border-radius: 10px; background: rgba(255,255,255,.07); color: #fff; font-weight: 700; font-size: .85rem; }
         .z-kds-sound[data-on="true"] { background: rgba(58,209,122,.18); color: #6ee79e; }
         .z-kds-sound[data-on="false"] { background: rgba(247,168,30,.2); color: #f5c372; animation: zsndpulse 1.6s infinite; }

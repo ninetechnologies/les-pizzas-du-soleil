@@ -5,7 +5,7 @@ import { REUNION_PATH } from '../data/reunion.js';
 /**
  * Splash d'accueil — signature "une maison La Case Toupin, de la Reunion".
  * Le contour de l'ile de la Reunion se dessine (tracé SVG anime, coordonnees reelles).
- * S'affiche UNE seule fois par visiteur (localStorage). Bouton passer + prefers-reduced-motion.
+ * S'affiche à chaque ouverture/rechargement du site. Bouton passer + prefers-reduced-motion.
  * Le message reste visible en continu via la bande "maison Case Toupin" au-dessus du footer.
  */
 export default function Splash({ onDone }) {

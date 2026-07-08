@@ -15,22 +15,9 @@ import FloatingActions from './components/FloatingActions.jsx';
 import LegalModal from './components/Legal.jsx';
 
 export default function App() {
-  const [showSplash, setShowSplash] = useState(() => {
-    try {
-      return !sessionStorage.getItem('pds_splash_seen');
-    } catch {
-      return true;
-    }
-  });
-
-  const dismissSplash = () => {
-    try {
-      sessionStorage.setItem('pds_splash_seen', '1');
-    } catch {
-      /* stockage indisponible : le splash ne reviendra pas pendant la session en cours */
-    }
-    setShowSplash(false);
-  };
+  // Splash affiché à CHAQUE ouverture/rechargement du site (animation courte, choix de Marie).
+  const [showSplash, setShowSplash] = useState(true);
+  const dismissSplash = () => setShowSplash(false);
 
   useEffect(() => {
     const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;

@@ -2,6 +2,7 @@ import React from 'react';
 import { motion } from 'motion/react';
 import Logo from './Logo.jsx';
 import { openLegal } from './Legal.jsx';
+import { REUNION_PATH } from '../data/reunion.js';
 
 // TODO remplacer par le vrai lien Google Business quand la fiche est creee
 const GOOGLE = 'https://www.google.com/search?q=Les+Pizzas+du+Soleil+Saint-Gaudens';
@@ -10,6 +11,21 @@ export default function Footer() {
   return (
     <footer className="z-footer">
       <div className="z-container">
+        <motion.div
+          className="z-footer-origin"
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: '-60px' }}
+          transition={{ duration: 0.6 }}
+        >
+          <svg className="z-footer-origin-map" viewBox="0 0 1000 895" aria-hidden="true">
+            <path d={REUNION_PATH} fill="currentColor" />
+          </svg>
+          <p>
+            Une maison <strong>La Case Toupin</strong> · les saveurs de la Réunion à Saint-Gaudens
+          </p>
+        </motion.div>
+
         <motion.div
           className="z-footer-grid"
           initial={{ opacity: 0, y: 30 }}
@@ -75,6 +91,21 @@ export default function Footer() {
 
       <style>{`
         .z-footer { padding: 80px 0 32px; background: var(--z-black); color: rgba(255, 255, 255, 0.75); }
+        .z-footer-origin {
+          display: flex; align-items: center; justify-content: center; gap: 14px;
+          padding: 0 0 40px; margin-bottom: 44px;
+          border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+          text-align: center;
+        }
+        .z-footer-origin-map { width: 34px; height: auto; color: var(--z-gold); opacity: 0.9; flex: 0 0 auto; }
+        .z-footer-origin p {
+          margin: 0; font-size: 0.9rem; letter-spacing: 0.01em;
+          color: rgba(255, 255, 255, 0.7);
+        }
+        .z-footer-origin strong {
+          font-family: var(--z-font-display); font-weight: 700; color: var(--z-gold); letter-spacing: 0;
+        }
+        @media (max-width: 520px) { .z-footer-origin { flex-direction: column; gap: 10px; } }
         .z-footer-grid {
           display: grid; grid-template-columns: 1fr; gap: 40px;
           padding-bottom: 48px; border-bottom: 1px solid rgba(255, 255, 255, 0.1);

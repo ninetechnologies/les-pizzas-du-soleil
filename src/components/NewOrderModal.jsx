@@ -46,7 +46,6 @@ export default function NewOrderModal({ onClose, onCreated }) {
   const [lines, setLines] = useState([]); // { uid, name, size, basePrice, price, qty, ingredients, removed, extras }
   const [editingUid, setEditingUid] = useState(null); // ligne en cours de personnalisation
   const [remiseStr, setRemiseStr] = useState(''); // saisie libre ("2,50") pour permettre les centimes
-  const [promoOff, setPromoOff] = useState(false); // desactive l'offre d'ouverture si besoin
   const [cashGiven, setCashGiven] = useState('');
   const [freeName, setFreeName] = useState('');
   const [freePrice, setFreePrice] = useState('');
@@ -57,30 +56,12 @@ export default function NewOrderModal({ onClose, onCreated }) {
 
   const subtotal = useMemo(() => lines.reduce((s, l) => s + l.price * l.qty, 0), [lines]);
 
-  // Offre d'ouverture, appliquee AUTOMATIQUEMENT et UNE SEULE FOIS par commande :
-  // pour 2 pizzas 33 cm achetees, une pizza 25 cm + une grande boisson (soda 1,5 L)
-  // offertes. On offre ce qui est present au panier : la pizza 25 la moins chere
-  // (prix de base, les supplements restent dus) et/ou une grande boisson.
-  const promo = useMemo(() => {
-    const count33 = lines.filter((l) => l.size === '33 cm').reduce((s, l) => s + l.qty, 0);
-    if (count33 < 2) return { amount: 0, parts: [] };
-    const parts = [];
-    const p25 = lines
-      .filter((l) => l.size === '25 cm')
-      .sort((a, b) => a.basePrice - b.basePrice)[0];
-    if (p25) parts.push({ label: `${p25.name} 25 cm`, amount: p25.basePrice });
-    const drink = lines.find((l) => l.name === 'Soda 1,5 L');
-    if (drink) parts.push({ label: 'Soda 1,5 L', amount: drink.basePrice });
-    return { amount: parts.reduce((s, p) => s + p.amount, 0), parts };
-  }, [lines]);
-  const promoApplied = promoOff ? 0 : Math.min(promo.amount, subtotal);
-
   const remise = (() => {
     const v = parseFloat(String(remiseStr).replace(',', '.'));
     return Number.isNaN(v) || v < 0 ? 0 : v;
   })();
-  const remiseApplied = Math.min(remise, subtotal - promoApplied);
-  const total = Math.max(0, subtotal - promoApplied - remiseApplied);
+  const remiseApplied = Math.min(remise, subtotal);
+  const total = Math.max(0, subtotal - remiseApplied);
   const count = useMemo(() => lines.reduce((s, l) => s + l.qty, 0), [lines]);
 
   // Rendu de monnaie (especes) : affichage seul, rien n'est stocke.
@@ -211,7 +192,6 @@ export default function NewOrderModal({ onClose, onCreated }) {
       removed: l.removed,
       extras: l.extras,
     }));
-    if (promoApplied > 0) items.push({ name: "Offre d'ouverture (2 pizzas 33 achetées)", qty: 1, price: -promoApplied, size: null, removed: [], extras: [] });
     if (remiseApplied > 0) items.push({ name: 'Remise', qty: 1, price: -remiseApplied, size: null, removed: [], extras: [] });
     return {
       code,
@@ -287,12 +267,6 @@ export default function NewOrderModal({ onClose, onCreated }) {
             </div>
 
             <div className="z-no-cats">
-              {/* Rappel promo d'ouverture : meme avantage qu'en ligne, applique en caisse */}
-              <div className="z-no-promo" role="note">
-                <strong>Offre d'ouverture</strong> : pour 2 pizzas 33 cm achetées, une pizza 25 cm
-                et une grande boisson offertes. Appliquée automatiquement au total (1 fois par commande).
-              </div>
-
               {filtered.map((sec) => (
                 <div key={sec.cat} className="z-no-cat">
                   <h4>{sec.cat}</h4>
@@ -522,7 +496,7 @@ export default function NewOrderModal({ onClose, onCreated }) {
                   ))}
                   <button
                     data-on={total === 0 && subtotal > 0}
-                    onClick={() => setRemiseStr(total === 0 && subtotal > 0 ? '' : String(subtotal - promoApplied).replace('.', ','))}
+                    onClick={() => setRemiseStr(total === 0 && subtotal > 0 ? '' : String(subtotal).replace('.', ','))}
                     disabled={subtotal === 0}
                   >
                     Offert
@@ -539,26 +513,8 @@ export default function NewOrderModal({ onClose, onCreated }) {
               </div>
 
               <div className="z-no-totals">
-                {(promoApplied > 0 || remiseApplied > 0) && (
+                {remiseApplied > 0 && (
                   <div className="z-no-subrow"><span>Sous-total</span><span>{fmt(subtotal)}</span></div>
-                )}
-                {promoApplied > 0 && (
-                  <div className="z-no-subrow z-no-subrow-remise">
-                    <span>
-                      Offre d'ouverture ({promo.parts.map((p) => p.label).join(' + ')} offert{promo.parts.length > 1 ? 's' : ''})
-                      <button className="z-no-promo-off" onClick={() => setPromoOff(true)}>retirer</button>
-                    </span>
-                    <span>−{fmt(promoApplied)}</span>
-                  </div>
-                )}
-                {promoOff && promo.amount > 0 && (
-                  <div className="z-no-subrow">
-                    <span>
-                      Offre d'ouverture retirée
-                      <button className="z-no-promo-off" onClick={() => setPromoOff(false)}>rétablir</button>
-                    </span>
-                    <span />
-                  </div>
                 )}
                 {remiseApplied > 0 && (
                   <div className="z-no-subrow z-no-subrow-remise"><span>Remise</span><span>−{fmt(remiseApplied)}</span></div>
@@ -631,11 +587,6 @@ export default function NewOrderModal({ onClose, onCreated }) {
         .z-no-search { display: flex; align-items: center; gap: 10px; padding: 14px 18px; border-bottom: 1px solid rgba(255,255,255,.08); color: rgba(255,255,255,.5); flex-shrink: 0; }
         .z-no-search input { flex: 1; background: transparent; border: none; color: #fff; font-size: 1rem; outline: none; font-family: var(--z-font-body); min-height: 32px; }
         .z-no-cats { overflow-y: auto; padding: 8px 18px 20px; }
-        .z-no-promo {
-          margin-top: 12px; padding: 10px 14px; border-radius: 12px; font-size: .8rem; line-height: 1.45;
-          background: rgba(247,168,30,.12); border: 1px solid rgba(247,168,30,.4); color: rgba(255,255,255,.85);
-        }
-        .z-no-promo strong { color: var(--z-gold); }
         .z-no-cat { margin-top: 14px; }
         .z-no-cat h4 { font-family: var(--z-font-display); font-size: .95rem; font-weight: 700; color: var(--z-gold); margin: 0 0 8px; letter-spacing: .02em; }
         .z-no-cat ul { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 6px; }
@@ -764,8 +715,6 @@ export default function NewOrderModal({ onClose, onCreated }) {
         .z-no-totals { margin-bottom: 12px; }
         .z-no-subrow { display: flex; align-items: baseline; justify-content: space-between; font-size: .85rem; color: rgba(255,255,255,.6); padding: 2px 0; font-variant-numeric: tabular-nums; }
         .z-no-subrow-remise { color: var(--z-gold); font-weight: 600; }
-        .z-no-promo-off { margin-left: 8px; font-size: .72rem; color: rgba(255,255,255,.5); text-decoration: underline; background: none; border: none; padding: 2px 4px; cursor: pointer; }
-        .z-no-promo-off:hover { color: #fff; }
         .z-no-total { display: flex; align-items: baseline; justify-content: space-between; }
         .z-no-total span { font-size: .82rem; color: rgba(255,255,255,.6); }
         .z-no-total strong { font-family: var(--z-font-display); font-weight: 900; font-size: 2rem; color: var(--z-gold); font-variant-numeric: tabular-nums; }

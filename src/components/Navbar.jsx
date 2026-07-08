@@ -44,6 +44,10 @@ export default function Navbar() {
             title="Double-clic : accès écran cuisine"
           >
             <Logo size={46} />
+            <span className="z-nav-by" aria-label="une maison La Case Toupin">
+              <span className="z-nav-by-pre">by</span>
+              <span className="z-nav-by-name">La Case Toupin</span>
+            </span>
           </a>
 
           <nav className="z-nav-links" aria-label="Navigation principale">
@@ -139,7 +143,31 @@ export default function Navbar() {
           justify-content: space-between;
           gap: 24px;
         }
-        .z-nav-brand { display: flex; align-items: center; z-index: 2; }
+        .z-nav-brand { display: flex; align-items: center; gap: 11px; z-index: 2; }
+        .z-nav-by {
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+          line-height: 1.05;
+          padding-left: 11px;
+          border-left: 1px solid currentColor;
+          color: var(--z-logo-color);
+          transition: color 0.4s;
+        }
+        .z-nav-by-pre {
+          font-size: 0.6rem;
+          font-weight: 500;
+          letter-spacing: 0.16em;
+          text-transform: uppercase;
+          opacity: 0.7;
+        }
+        .z-nav-by-name {
+          font-family: var(--z-font-display);
+          font-size: 0.82rem;
+          font-weight: 600;
+          letter-spacing: 0.01em;
+          white-space: nowrap;
+        }
         .z-nav-links { display: none; gap: 36px; }
         .z-nav-link {
           font-size: 0.95rem;

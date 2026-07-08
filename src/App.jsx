@@ -1,9 +1,10 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
+import { AnimatePresence } from 'motion/react';
 import Lenis from 'lenis';
 import { CartProvider } from './hooks/useCart.jsx';
 import Navbar from './components/Navbar.jsx';
+import Splash from './components/Splash.jsx';
 import Hero from './components/Hero.jsx';
-import PromoBanner from './components/PromoBanner.jsx';
 import Menu from './components/Menu.jsx';
 import Order from './components/Order.jsx';
 import Reviews from './components/Reviews.jsx';
@@ -14,6 +15,23 @@ import FloatingActions from './components/FloatingActions.jsx';
 import LegalModal from './components/Legal.jsx';
 
 export default function App() {
+  const [showSplash, setShowSplash] = useState(() => {
+    try {
+      return !sessionStorage.getItem('pds_splash_seen');
+    } catch {
+      return true;
+    }
+  });
+
+  const dismissSplash = () => {
+    try {
+      sessionStorage.setItem('pds_splash_seen', '1');
+    } catch {
+      /* stockage indisponible : le splash ne reviendra pas pendant la session en cours */
+    }
+    setShowSplash(false);
+  };
+
   useEffect(() => {
     const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     if (prefersReduced) return;
@@ -48,10 +66,12 @@ export default function App() {
 
   return (
     <CartProvider>
+      <AnimatePresence>
+        {showSplash && <Splash key="splash" onDone={dismissSplash} />}
+      </AnimatePresence>
       <Navbar />
       <main>
         <Hero />
-        <PromoBanner />
         <Menu />
         <Order />
         <Reviews />

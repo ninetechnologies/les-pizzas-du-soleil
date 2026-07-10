@@ -6,6 +6,7 @@
 
 const pi = (s) => `/images/pizzas/${s}`;
 const ai = (s) => `/images/ambiance/${s}`;
+const mi = (s) => `/images/menu/${s}.webp`;
 
 /* Construit les 3 tailles d'une pizza a partir des 3 prix (25 / 33 / 40 cm). */
 const sz = (p25, p33, p40) => [
@@ -160,19 +161,19 @@ export const CARTE = [
   {
     cat: 'Boissons',
     items: [
-      { name: 'Coca-Cola', desc: "33 cl.", price: 2 },
-      { name: 'Coca-Cola Zéro', desc: "33 cl.", price: 2 },
-      { name: 'Coca-Cola Cherry', desc: "33 cl.", price: 2 },
-      { name: 'Fanta Orange', desc: "33 cl.", price: 2 },
-      { name: 'Fanta Dragon', desc: "33 cl.", price: 2 },
-      { name: 'Sprite', desc: "33 cl.", price: 2 },
-      { name: 'Orangina', desc: "33 cl.", price: 2 },
-      { name: 'Schweppes Agrumes', desc: "33 cl.", price: 2 },
-      { name: 'Oasis Tropical', desc: "33 cl.", price: 2 },
-      { name: 'Oasis Pomme Cassis', desc: "33 cl.", price: 2 },
-      { name: 'Ice Tea Pêche', desc: "33 cl.", price: 2 },
+      { name: 'Coca-Cola', desc: "33 cl.", price: 2, img: mi('boisson-coca') },
+      { name: 'Coca-Cola Zéro', desc: "33 cl.", price: 2, img: mi('boisson-coca-zero') },
+      { name: 'Coca-Cola Cherry', desc: "33 cl.", price: 2, img: mi('boisson-coca-cherry') },
+      { name: 'Fanta Orange', desc: "33 cl.", price: 2, img: mi('boisson-fanta-orange') },
+      { name: 'Fanta Dragon', desc: "33 cl.", price: 2, img: mi('boisson-fanta-dragon') },
+      { name: 'Sprite', desc: "33 cl.", price: 2, img: mi('boisson-sprite') },
+      { name: 'Orangina', desc: "33 cl.", price: 2, img: mi('boisson-orangina') },
+      { name: 'Schweppes Agrumes', desc: "33 cl.", price: 2, img: mi('boisson-schweppes') },
+      { name: 'Oasis Tropical', desc: "33 cl.", price: 2, img: mi('boisson-oasis-tropical') },
+      { name: 'Oasis Pomme Cassis', desc: "33 cl.", price: 2, img: mi('boisson-oasis-pomme-cassis') },
+      { name: 'Ice Tea Pêche', desc: "33 cl.", price: 2, img: mi('boisson-ice-tea') },
       { name: 'Soda 1,5 L', desc: "Bouteille 1,5 L.", price: 4.5 },
-      { name: 'Eau', desc: "33 cl.", price: 2 },
+      { name: 'Eau', desc: "33 cl.", price: 2, img: mi('boisson-eau') },
     ],
   },
   {

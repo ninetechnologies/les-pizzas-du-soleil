@@ -180,7 +180,7 @@ export const CARTE = [
   {
     cat: 'Bières & vins (sous licence)',
     items: [
-      { name: 'Desperados', desc: "Bière, bouteille.", price: 4 },
+      { name: 'Desperados', desc: "Bière, bouteille.", price: 4, img: '/images/menu/boisson-desperados.png' },
       { name: 'Heineken', desc: "Bière, bouteille.", price: 4, img: mj('boisson-heineken') },
       { name: 'Vin', desc: "Bouteille 75 cl.", price: 9, img: '/images/menu/boisson-vin.png' },
     ],

@@ -172,7 +172,7 @@ export const CARTE = [
       { name: 'Oasis Tropical', desc: "33 cl.", price: 2, img: mi('boisson-oasis-tropical') },
       { name: 'Oasis Pomme Cassis', desc: "33 cl.", price: 2, img: mi('boisson-oasis-pomme-cassis') },
       { name: 'Ice Tea Pêche', desc: "33 cl.", price: 2, img: mi('boisson-ice-tea') },
-      { name: 'Soda 1,5 L', desc: "Bouteille 1,5 L.", price: 4.5 },
+      { name: 'Soda 1,5 L', desc: "Bouteille 1,5 L.", price: 4.5, img: '/images/menu/boisson-soda-1-5l.jpg' },
       { name: 'Eau', desc: "33 cl.", price: 2, img: mi('boisson-eau') },
     ],
   },

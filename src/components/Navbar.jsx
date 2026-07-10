@@ -150,8 +150,8 @@ export default function Navbar() {
           justify-content: center;
           line-height: 1.05;
           padding-left: 11px;
-          border-left: 1px solid currentColor;
-          color: var(--z-logo-color);
+          border-left: 1px solid var(--z-red);
+          color: var(--z-red);
           transition: color 0.4s;
         }
         .z-nav-by-pre {

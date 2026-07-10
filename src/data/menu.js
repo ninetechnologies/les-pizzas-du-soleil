@@ -242,7 +242,7 @@ export const LOCATIONS = [
     telHref: '+33531616347',
     rating: null,
     reviews: '',
-    image: ai('galerie-2.jpg'),
+    image: ai('devanture.jpg'),
     mapsEmbed:
       "https://maps.google.com/maps?q=7+avenue+Francois+Mitterrand+31800+Saint-Gaudens&t=&z=16&ie=UTF8&iwloc=&output=embed",
     mapsDir:

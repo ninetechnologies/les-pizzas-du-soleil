@@ -7,6 +7,7 @@
 const pi = (s) => `/images/pizzas/${s}`;
 const ai = (s) => `/images/ambiance/${s}`;
 const mi = (s) => `/images/menu/${s}.webp`;
+const mj = (s) => `/images/menu/${s}.jpg`;
 
 /* Construit les 3 tailles d'une pizza a partir des 3 prix (25 / 33 / 40 cm). */
 const sz = (p25, p33, p40) => [
@@ -153,9 +154,9 @@ export const CARTE = [
   {
     cat: 'À la pièce',
     items: [
-      { name: 'Tenders (5 pièces)', desc: "5 tenders de poulet.", price: 6 },
-      { name: 'Wings (5 pièces)', desc: "5 wings de poulet.", price: 5 },
-      { name: 'Portion de frites', desc: "Une portion de frites maison.", price: 2.5 },
+      { name: 'Tenders (5 pièces)', desc: "5 tenders de poulet.", price: 6, img: mi('piece-tenders') },
+      { name: 'Wings (5 pièces)', desc: "5 wings de poulet.", price: 5, img: mj('piece-wings') },
+      { name: 'Portion de frites', desc: "Une portion de frites maison.", price: 2.5, img: mj('piece-frites') },
     ],
   },
   {
@@ -180,7 +181,7 @@ export const CARTE = [
     cat: 'Bières & vins (sous licence)',
     items: [
       { name: 'Desperados', desc: "Bière, bouteille.", price: 4 },
-      { name: 'Heineken', desc: "Bière, bouteille.", price: 4 },
+      { name: 'Heineken', desc: "Bière, bouteille.", price: 4, img: mj('boisson-heineken') },
       { name: 'Vin', desc: "Bouteille 75 cl.", price: 9 },
     ],
   },

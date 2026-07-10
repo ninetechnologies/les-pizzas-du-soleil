@@ -182,7 +182,7 @@ export const CARTE = [
     items: [
       { name: 'Desperados', desc: "Bière, bouteille.", price: 4 },
       { name: 'Heineken', desc: "Bière, bouteille.", price: 4, img: mj('boisson-heineken') },
-      { name: 'Vin', desc: "Bouteille 75 cl.", price: 9 },
+      { name: 'Vin', desc: "Bouteille 75 cl.", price: 9, img: '/images/menu/boisson-vin.png' },
     ],
   },
   {

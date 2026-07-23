@@ -30,3 +30,5 @@ carte.html
 *.local.txt
 A-APPLIQUER-*.md
 BRIEF-*.md
+export_carte_data.mjs
+carte-data.json

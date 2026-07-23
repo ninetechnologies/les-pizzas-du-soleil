@@ -51,8 +51,8 @@ export const FEATURED = [
     id: 'norvegienne',
     name: 'Norvégienne',
     desc: "Tomate, emmental, saumon, citron, crème fraîche.",
-    price: 8,
-    sizes: sz(8, 13, 15),
+    price: 13,
+    sizes: sz(13, 18, 24),
     image: pi('saumon-aneth.jpg'),
     signature: true,
   },
@@ -81,7 +81,8 @@ export const CARTE = [
       { name: 'Reine', desc: "Tomate, emmental, jambon, olive.", price: 6.5, sizes: sz(6.5, 12.5, 15), img: pi('jambon-champignons.jpg') },
       { name: 'Roma', desc: "Tomate, emmental, jambon, merguez, œuf, olive.", price: 7.5, sizes: sz(7.5, 13, 16), img: pi('jambon-oeuf.jpg') },
       { name: 'Hawaïenne', desc: "Tomate, emmental, poulet, ananas, olive.", price: 7, sizes: sz(7, 13, 16) },
-      { name: 'Pépéronna', desc: "Tomate, mozzarella, chorizo, olive.", price: 7, sizes: sz(7, 13, 16), img: pi('peperonna.jpg') },
+      // Marie 23/07 : garde le nom Pépéronna, recette chorizo + saucisson épicé, prix 11,50/15/21
+      { name: 'Pépéronna', desc: "Tomate, mozzarella, chorizo, saucisson épicé, olive.", price: 11.5, sizes: sz(11.5, 15, 21), img: pi('peperonna.jpg') },
       { name: 'Campagnarde', desc: "Tomate, emmental, lardon, chèvre, olive.", price: 6.5, sizes: sz(6.5, 12.5, 15) },
       { name: 'Alsacienne', desc: "Crème fraîche, emmental, pomme de terre, oignons, lardons, olive.", price: 6.5, sizes: sz(6.5, 12.5, 15), img: pi('carbonara.jpg') },
       { name: 'Casa Blanca', desc: "Crème fraîche, champignons, lardons, chèvre, miel, mozzarella.", price: 7, sizes: sz(7, 13, 16) },
@@ -118,7 +119,8 @@ export const CARTE = [
       { name: 'Pilita', desc: "Tomate, emmental, rillettes de sardines au citron, crème fraîche.", price: 8.5, sizes: sz(8.5, 14.5, 16.5) },
       { name: 'Sardine', desc: "Tomate, emmental, salade de sardines, oignon, gros piment.", price: 7, sizes: sz(7, 10.5, 13) },
       { name: 'Océane', desc: "Tomate, emmental, saumon, crevettes, moules, citron, crème fraîche.", price: 13, sizes: sz(13, 18, 24), img: pi('oceane.jpg') },
-      { name: 'Norvégienne', desc: "Tomate, emmental, saumon, citron, crème fraîche.", price: 8, sizes: sz(8, 13, 15), img: pi('saumon-aneth.jpg') },
+      // Marie 23/07 : la ligne "Saumon" de son tableau = la Norvégienne, on garde le nom, prix 13/18/24
+      { name: 'Norvégienne', desc: "Tomate, emmental, saumon, citron, crème fraîche.", price: 13, sizes: sz(13, 18, 24), img: pi('saumon-aneth.jpg') },
       // Compo + prix mis a jour le 23/07/2026 (tableau Marie : ajout capres, mozzarella a la place de l'emmental)
       { name: 'Napolitaine', desc: "Tomate, mozzarella, anchois, olives, câpres.", price: 10, sizes: sz(10, 13, 18) },
     ],

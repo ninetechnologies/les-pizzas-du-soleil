@@ -26,7 +26,7 @@ export const FEATURED = [
     desc: "Tomate, emmental, bouchons, oignon, gros piment, olive.",
     price: 7.5,
     sizes: sz(7.5, 13.5, 16.5),
-    image: pi('saucisse-piment.jpg'), // photo provisoire, a remplacer par la vraie
+    image: pi('saucisse-fumee.jpg'), // vraie photo Marie (les fichiers saucisse-* portent le nom de l'autre pizza, mapping corrige le 23/07)
     signature: true,
   },
   {
@@ -60,16 +60,16 @@ export const FEATURED = [
     id: 'chevre-miel',
     name: 'Chèvre-Miel',
     desc: "Tomate, emmental, chèvre, miel, olive.",
-    price: 8.5,
-    sizes: sz(8.5, 13, 15),
+    price: 11,
+    sizes: sz(11, 15, 21),
     image: pi('chevre-miel-reelle.jpg'),
   },
   {
     id: '4-fromages',
     name: '4 Fromages',
     desc: "Tomate, emmental, roquefort, chèvre, raclette, oignon, crème fraîche.",
-    price: 8.5,
-    sizes: sz(8.5, 13, 15),
+    price: 11,
+    sizes: sz(11, 15, 21),
     image: pi('4-fromages.jpg'),
   },
 ];
@@ -88,11 +88,15 @@ export const CARTE = [
       { name: 'Orientale', desc: "Tomate, emmental, poivron, merguez, olive.", price: 6.5, sizes: sz(6.5, 12.5, 15), img: pi('merguez-poivrons.jpg') },
       { name: 'Chicken', desc: "Tomate, emmental, poivron, poulet, crème fraîche, olive.", price: 7, sizes: sz(7, 13, 16) },
       { name: 'Créole', desc: "Tomate, emmental, saucisse fumée, oignon, gros piment, olive.", price: 7.5, sizes: sz(7.5, 13.5, 16.5) },
-      { name: 'Le Soleil', desc: "Tomate, emmental, bouchons, oignon, gros piment, olive.", price: 7.5, sizes: sz(7.5, 13.5, 16.5), img: pi('saucisse-piment.jpg') },
+      { name: 'Le Soleil', desc: "Tomate, emmental, bouchons, oignon, gros piment, olive.", price: 7.5, sizes: sz(7.5, 13.5, 16.5), img: pi('saucisse-fumee.jpg') },
       { name: 'Forestière', desc: "Tomate, emmental, champignons, lardons, pomme de terre, olive.", price: 7, sizes: sz(7, 13, 16) },
       { name: 'Spéciale', desc: "Tomate, emmental, jambon, chorizo, merguez, lardons, poivron.", price: 7, sizes: sz(7, 13, 16) },
-      { name: 'Saucisse Fumée', desc: "Tomate, emmental, saucisse épicée.", price: 7, sizes: sz(7, 13, 16), img: pi('saucisse-fumee.jpg') },
+      { name: 'Saucisse Fumée', desc: "Tomate, emmental, saucisse épicée.", price: 11, sizes: sz(11, 15, 21), img: pi('saucisse-piment.jpg') }, // photo provisoire (l'autre fichier = vraie photo, sur Le Soleil)
       { name: 'Rougail Saucisse', desc: "Tomate, emmental, saucisse, sauce rougail, oignon, gros piment.", price: 7.5, sizes: sz(7.5, 13.5, 16.5) },
+      // Ajouts carte Marie 23/07/2026
+      { name: 'Savoyarde', desc: "Crème fraîche, pommes de terre, reblochon, raclette, lardons, oignons, emmental.", price: 12, sizes: sz(12, 16, 22) },
+      { name: 'Magret', desc: "Crème fraîche, magret, pommes de terre, emmental, persillade, olives.", price: 13.5, sizes: sz(13.5, 18.5, 24) },
+      { name: 'Gorgonzola', desc: "Tomate, mozzarella, emmental, gorgonzola, oignons, pommes de terre, jambon, roquette, crème balsamique, noix.", price: 10.5, sizes: sz(10.5, 14.5, 18.5) },
       { name: 'Calzone', desc: "Pizza pliée : jambon, champignons, œuf, oignon, emmental.", price: 9, sizes: sz(9, 12.5, 15.5), img: pi('calzone.jpg') },
     ],
   },
@@ -100,8 +104,8 @@ export const CARTE = [
     cat: 'Pizzas Fromages & Légumes',
     items: [
       { name: 'Margherita', desc: "Tomate, emmental, olive.", price: 7, sizes: sz(7, 10, 13), img: pi('fromage-olives.jpg') },
-      { name: 'Chèvre-Miel', desc: "Tomate, emmental, chèvre, miel, olive.", price: 8.5, sizes: sz(8.5, 13, 15), img: pi('chevre-miel-reelle.jpg') },
-      { name: '4 Fromages', desc: "Tomate, emmental, roquefort, chèvre, raclette, oignon, crème fraîche.", price: 8.5, sizes: sz(8.5, 13, 15), img: pi('4-fromages.jpg') },
+      { name: 'Chèvre-Miel', desc: "Tomate, emmental, chèvre, miel, olive.", price: 11, sizes: sz(11, 15, 21), img: pi('chevre-miel-reelle.jpg') },
+      { name: '4 Fromages', desc: "Tomate, emmental, roquefort, chèvre, raclette, oignon, crème fraîche.", price: 11, sizes: sz(11, 15, 21), img: pi('4-fromages.jpg') },
       { name: 'Végétarienne', desc: "Tomate, emmental, champignons, poivrons verts, oignon, œuf, persillade.", price: 7, sizes: sz(7, 13, 15) },
       { name: 'La Fermière', desc: "Tomate, mozzarella, champignons, œuf, persillade, olive.", price: 8, sizes: sz(8, 13.5, 15) },
     ],
@@ -113,9 +117,10 @@ export const CARTE = [
       // "Pita" renommee "Pilita" a la demande de Marie (14/06).
       { name: 'Pilita', desc: "Tomate, emmental, rillettes de sardines au citron, crème fraîche.", price: 8.5, sizes: sz(8.5, 14.5, 16.5) },
       { name: 'Sardine', desc: "Tomate, emmental, salade de sardines, oignon, gros piment.", price: 7, sizes: sz(7, 10.5, 13) },
-      { name: 'Océane', desc: "Tomate, emmental, saumon, crevettes, moules, citron, crème fraîche.", price: 8.5, sizes: sz(8.5, 14, 16.5), img: pi('oceane.jpg') },
+      { name: 'Océane', desc: "Tomate, emmental, saumon, crevettes, moules, citron, crème fraîche.", price: 13, sizes: sz(13, 18, 24), img: pi('oceane.jpg') },
       { name: 'Norvégienne', desc: "Tomate, emmental, saumon, citron, crème fraîche.", price: 8, sizes: sz(8, 13, 15), img: pi('saumon-aneth.jpg') },
-      { name: 'Napolitaine', desc: "Tomate, emmental, anchois, olives.", price: 7, sizes: sz(7, 14, 15.5) },
+      // Compo + prix mis a jour le 23/07/2026 (tableau Marie : ajout capres, mozzarella a la place de l'emmental)
+      { name: 'Napolitaine', desc: "Tomate, mozzarella, anchois, olives, câpres.", price: 10, sizes: sz(10, 13, 18) },
     ],
   },
   {

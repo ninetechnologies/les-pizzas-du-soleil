@@ -62,7 +62,7 @@ export const FEATURED = [
     desc: "Tomate, emmental, chèvre, miel, olive.",
     price: 11,
     sizes: sz(11, 15, 21),
-    image: pi('chevre-miel-reelle.jpg'),
+    image: pi('chevre-miel-2.jpg'), // vraie photo Marie 02/09
   },
   {
     id: '4-fromages',
@@ -70,7 +70,7 @@ export const FEATURED = [
     desc: "Tomate, emmental, roquefort, chèvre, raclette, oignon, crème fraîche.",
     price: 11,
     sizes: sz(11, 15, 21),
-    image: pi('4-fromages.jpg'),
+    image: pi('4-fromages-2.jpg'), // vraie photo Marie 02/09
   },
 ];
 
@@ -80,12 +80,12 @@ export const CARTE = [
     items: [
       { name: 'Reine', desc: "Tomate, emmental, jambon, olive.", price: 6.5, sizes: sz(6.5, 12.5, 15), img: pi('jambon-champignons.jpg') },
       { name: 'Roma', desc: "Tomate, emmental, jambon, merguez, œuf, olive.", price: 7.5, sizes: sz(7.5, 13, 16), img: pi('jambon-oeuf.jpg') },
-      { name: 'Hawaïenne', desc: "Tomate, emmental, poulet, ananas, olive.", price: 7, sizes: sz(7, 13, 16) },
+      { name: 'Hawaïenne', desc: "Tomate, emmental, poulet, ananas, olive.", price: 7, sizes: sz(7, 13, 16), img: pi('hawaienne.jpg') },
       // Marie 23/07 : garde le nom Pépéronna, recette chorizo + saucisson épicé, prix 11,50/15/21
       { name: 'Pépéronna', desc: "Tomate, mozzarella, chorizo, saucisson épicé, olive.", price: 11.5, sizes: sz(11.5, 15, 21), img: pi('peperonna.jpg') },
       { name: 'Campagnarde', desc: "Tomate, emmental, lardon, chèvre, olive.", price: 6.5, sizes: sz(6.5, 12.5, 15) },
       { name: 'Alsacienne', desc: "Crème fraîche, emmental, pomme de terre, oignons, lardons, olive.", price: 6.5, sizes: sz(6.5, 12.5, 15), img: pi('carbonara.jpg') },
-      { name: 'Casa Blanca', desc: "Crème fraîche, champignons, lardons, chèvre, miel, mozzarella.", price: 7, sizes: sz(7, 13, 16) },
+      { name: 'Casa Blanca', desc: "Crème fraîche, champignons, lardons, chèvre, miel, mozzarella.", price: 7, sizes: sz(7, 13, 16), img: pi('casa-blanca.jpg') },
       { name: 'Orientale', desc: "Tomate, emmental, poivron, merguez, olive.", price: 6.5, sizes: sz(6.5, 12.5, 15), img: pi('merguez-poivrons.jpg') },
       { name: 'Chicken', desc: "Tomate, emmental, poivron, poulet, crème fraîche, olive.", price: 7, sizes: sz(7, 13, 16) },
       { name: 'Créole', desc: "Tomate, emmental, saucisse fumée, oignon, gros piment, olive.", price: 7.5, sizes: sz(7.5, 13.5, 16.5) },
@@ -96,7 +96,7 @@ export const CARTE = [
       { name: 'Rougail Saucisse', desc: "Tomate, emmental, saucisse, sauce rougail, oignon, gros piment.", price: 7.5, sizes: sz(7.5, 13.5, 16.5) },
       // Ajouts carte Marie 23/07/2026
       { name: 'Savoyarde', desc: "Crème fraîche, pommes de terre, reblochon, raclette, lardons, oignons, emmental.", price: 12, sizes: sz(12, 16, 22) },
-      { name: 'Magret', desc: "Crème fraîche, magret, pommes de terre, emmental, persillade, olives.", price: 13.5, sizes: sz(13.5, 18.5, 24) },
+      { name: 'Magret', desc: "Crème fraîche, magret, pommes de terre, emmental, persillade, olives.", price: 13.5, sizes: sz(13.5, 18.5, 24), img: pi('magret.jpg') },
       { name: 'Gorgonzola', desc: "Tomate, mozzarella, emmental, gorgonzola, oignons, pommes de terre, jambon, roquette, crème balsamique, noix.", price: 10.5, sizes: sz(10.5, 14.5, 18.5) },
       { name: 'Calzone', desc: "Pizza pliée : jambon, champignons, œuf, oignon, emmental.", price: 9, sizes: sz(9, 12.5, 15.5), img: pi('calzone.jpg') },
     ],
@@ -105,9 +105,9 @@ export const CARTE = [
     cat: 'Pizzas Fromages & Légumes',
     items: [
       { name: 'Margherita', desc: "Tomate, emmental, olive.", price: 7, sizes: sz(7, 10, 13), img: pi('fromage-olives.jpg') },
-      { name: 'Chèvre-Miel', desc: "Tomate, emmental, chèvre, miel, olive.", price: 11, sizes: sz(11, 15, 21), img: pi('chevre-miel-reelle.jpg') },
-      { name: '4 Fromages', desc: "Tomate, emmental, roquefort, chèvre, raclette, oignon, crème fraîche.", price: 11, sizes: sz(11, 15, 21), img: pi('4-fromages.jpg') },
-      { name: 'Végétarienne', desc: "Tomate, emmental, champignons, poivrons verts, oignon, œuf, persillade.", price: 7, sizes: sz(7, 13, 15) },
+      { name: 'Chèvre-Miel', desc: "Tomate, emmental, chèvre, miel, olive.", price: 11, sizes: sz(11, 15, 21), img: pi('chevre-miel-2.jpg') },
+      { name: '4 Fromages', desc: "Tomate, emmental, roquefort, chèvre, raclette, oignon, crème fraîche.", price: 11, sizes: sz(11, 15, 21), img: pi('4-fromages-2.jpg') },
+      { name: 'Végétarienne', desc: "Tomate, emmental, champignons, poivrons verts, oignon, œuf, persillade.", price: 7, sizes: sz(7, 13, 15), img: pi('vegetarienne.jpg') },
       { name: 'La Fermière', desc: "Tomate, mozzarella, champignons, œuf, persillade, olive.", price: 8, sizes: sz(8, 13.5, 15) },
     ],
   },
@@ -129,10 +129,10 @@ export const CARTE = [
     cat: 'Plaques pizzas (40 x 60 cm)',
     items: [
       // Classique : recette fixe (type Margherita), pas de choix.
-      { name: 'Plaque classique', desc: "Grande plaque 40 x 60 cm, tomate et fromage (type Margherita).", price: 26.5 },
+      { name: 'Plaque classique', desc: "Grande plaque 40 x 60 cm, tomate et fromage (type Margherita).", price: 26.5, img: pi('plaque-classique.jpg') },
       // Les 3 suivantes : le client choisit le type de pizza dans la categorie correspondante.
       { name: 'Plaque viandes', desc: "Grande plaque 40 x 60 cm, pizza viande au choix.", price: 28.5, plaqueOf: 'Pizzas Viandes' },
-      { name: 'Plaque fromage', desc: "Grande plaque 40 x 60 cm, pizza fromage & légumes au choix.", price: 31, plaqueOf: 'Pizzas Fromages & Légumes' },
+      { name: 'Plaque fromage', desc: "Grande plaque 40 x 60 cm, pizza fromage & légumes au choix.", price: 31, plaqueOf: 'Pizzas Fromages & Légumes', img: pi('plaque-fromage.jpg') },
       { name: 'Plaque poisson', desc: "Grande plaque 40 x 60 cm, pizza poisson au choix.", price: 32.5, plaqueOf: 'Pizzas Poissons' },
     ],
   },
